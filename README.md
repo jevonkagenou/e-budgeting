@@ -1,16 +1,16 @@
-# Sistem Manajemen Reimbursement dan Pengajuan Dana Operasional (E-Budgeting)
+# E-Budgeting API - Sistem Manajemen Reimbursement
 
-[cite_start]Sistem E-Budgeting berbasis API ini dirancang untuk mendigitalisasi tata kelola keuangan internal, khususnya dalam proses *reimbursement* dan pengajuan dana operasional[cite: 2, 45]. [cite_start]Proyek ini dikembangkan untuk menggantikan birokrasi manual yang rentan terhadap kehilangan bukti fisik, proses persetujuan yang lambat, serta mencegah terjadinya *over-budgeting*[cite: 6, 8, 12].
+Proyek ini adalah sistem backend berbasis RESTful API yang dirancang untuk mengelola permohonan dana operasional dan *reimbursement* karyawan. Tujuan utama sistem ini adalah untuk menggantikan birokrasi kertas yang rentan hilang, mempercepat proses persetujuan, dan mencegah pengeluaran divisi yang melebihi batas anggaran.
 
-## Arsitektur Sistem
-[cite_start]Sistem ini mengadopsi pola arsitektur *Client-Server* terdistribusi[cite: 14, 48]:
-* [cite_start]**Backend (Web Panel & API):** Dibangun menggunakan framework **Laravel** sebagai pusat pengolah data, manajemen master data oleh Admin, serta penyedia layanan RESTful API yang diamankan dengan Laravel Sanctum[cite: 27, 49, 56, 57].
-* [cite_start]**Frontend (Mobile Thin Client):** Dibangun menggunakan **Flutter** yang berfokus menyajikan antarmuka pengguna interaktif bagi staf operasional untuk melakukan pengajuan data dengan cepat di lapangan[cite: 50, 64, 67].
+## Arsitektur Teknologi
+Sistem ini menggunakan arsitektur *Client-Server*:
+* **Backend:** Menggunakan kerangka kerja **Laravel** untuk memproses logika bisnis, mengelola *database* terpusat, dan menyediakan *endpoint* API. Keamanan akses diatur menggunakan **Laravel Sanctum**.
+* **Frontend:** Aplikasi seluler berbasis **Flutter** yang berfungsi sebagai *thin client* agar staf dapat mengunggah pengajuan langsung dari lapangan.
 
-## Fitur Utama (MVP)
-1.  [cite_start]**Pre-emptive Budget Locking:** Mekanisme validasi otomatis yang menolak pengajuan dana jika nominal melebihi sisa saldo divisi secara *real-time*[cite: 28, 78].
-2.  [cite_start]**Multi-Year Support:** Basis data terpusat yang mampu mengakomodasi pengelolaan anggaran lintas tahun tanpa perlu memisahkan portal aplikasi[cite: 22, 74].
-3.  [cite_start]**Digital Reimbursement Form:** Modul pengajuan yang mewajibkan unggahan foto struk fisik untuk digitalisasi bukti transaksi yang aman[cite: 80, 81, 84].
-4.  [cite_start]**Approval Workflow & Tracking:** Alur persetujuan terintegrasi yang memungkinkan staf memantau status pengajuan (Pending, Approved, Rejected) secara transparan[cite: 24, 86].
-5.  [cite_start]**Audit Trail:** Pencatatan jejak digital secara permanen yang merekam aktor validasi, alasan, dan waktu persis eksekusi sebagai pengganti tanda tangan basah[cite: 88, 89].
-6.  [cite_start]**Export to PDF:** Generator laporan otomatis untuk merangkum transaksi yang telah disetujui guna mempermudah pembuatan Laporan Pertanggungjawaban (LPJ)[cite: 91, 93].
+## Fitur Inti (MVP)
+* **Pre-emptive Budget Locking:** Validasi sistem yang akan memblokir pengajuan secara otomatis apabila nominal yang dimasukkan melebihi sisa anggaran divisi terkait.
+* **Dukungan Multi-Tahun:** Skema *database* yang dirancang untuk menyimpan riwayat anggaran dari berbagai tahun secara berdampingan tanpa perlu membuat sistem atau *database* baru setiap pergantian tahun.
+* **Digitalisasi Bukti Transaksi:** Mewajibkan pengguna untuk melampirkan foto struk fisik ke dalam sistem penyimpanan yang aman.
+* **Alur Persetujuan Transparan:** Memungkinkan staf untuk melihat status pengajuan mereka (Pending, Approved, atau Rejected) secara langsung melalui aplikasi.
+* **Jejak Audit (Audit Trail):** Sistem keamanan yang mencatat setiap aksi dari manajer atau admin saat menyetujui atau menolak dokumen, lengkap dengan alasan dan waktu eksekusi untuk akuntabilitas.
+* **Laporan Otomatis (Ekspor PDF):** Fitur untuk merangkum seluruh pengeluaran yang telah disetujui menjadi dokumen PDF untuk kebutuhan Laporan Pertanggungjawaban (LPJ).
