@@ -14,3 +14,15 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 * **Alur Persetujuan Transparan:** Memungkinkan staf untuk melihat status pengajuan mereka (Pending, Approved, atau Rejected) secara langsung melalui aplikasi.
 * **Jejak Audit (Audit Trail):** Sistem keamanan yang mencatat setiap aksi dari manajer atau admin saat menyetujui atau menolak dokumen, lengkap dengan alasan dan waktu eksekusi untuk akuntabilitas.
 * **Laporan Otomatis (Ekspor PDF):** Fitur untuk merangkum seluruh pengeluaran yang telah disetujui menjadi dokumen PDF untuk kebutuhan Laporan Pertanggungjawaban (LPJ).
+
+## Log Perubahan (Changelog)
+
+### [20 Maret 2026] - Initial Backend & Auth Foundation
+**By:** @jevonkagenou
+
+* **Database Setup:** Migrasi ke PostgreSQL dan implementasi skema tabel inti.
+* **Security Layer:** Implementasi Spatie Roles & Permissions (Admin, Manager, Staff).
+* **Authentication:** Sistem Login/Logout dengan proteksi Middleware dan logika *Role-based redirection*.
+* **UI Restructuring:** Refaktor Master Layout Sneat menggunakan Blade Components (`@include` & `@extends`).
+* **User Feedback:** Implementasi notifikasi Toast (Bootstrap 5) dan SweetAlert2 untuk UX yang lebih modern.
+* **Data Seeding:** Pembuatan akun *tester* otomatis untuk mempermudah fase pengembangan.
