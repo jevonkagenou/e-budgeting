@@ -58,10 +58,37 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <li class="menu-item active">
-            <a href="#" class="menu-link">
+        <li class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+            <a href="{{ url('admin/dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Analytics">Dashboard</div>
+            </a>
+        </li>
+
+        @if (Auth::user()->hasRole('admin'))
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Kelola Data</span>
+            </li>
+
+            <li class="menu-item {{ request()->routeIs('admin.divisions.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.divisions.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-sitemap"></i>
+                    <div data-i18n="Divisi">Divisi</div>
+                </a>
+            </li>
+
+            <li class="menu-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.users.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-user"></i>
+                    <div data-i18n="Pengguna">Pengguna</div>
+                </a>
+            </li>
+        @endif
+
+        <li class="menu-item {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.logs.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-history"></i>
+                <div data-i18n="Log Aktivitas">Log Aktivitas</div>
             </a>
         </li>
 

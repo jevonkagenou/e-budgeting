@@ -2,46 +2,52 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
+use App\Models\Division;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class RoleAndUserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //Roles
-        $adminRole = Role::create(['name' => 'admin']);
-        $managerRole = Role::create(['name' => 'manager']);
-        $staffRole = Role::create(['name' => 'staff']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $managerRole = Role::firstOrCreate(['name' => 'manager']);
+        $staffRole = Role::firstOrCreate(['name' => 'staff']);
 
-        // Admin
-        $admin = User::create([
-            'name' => 'Felix',
-            'email' => 'admin@syncbudget.com',
-            'password' => Hash::make('password123'),
-        ]);
+        $divIT = Division::where('name', 'IT & Development')->first();
+        $divKeuangan = Division::where('name', 'Keuangan')->first();
+        $divOperasional = Division::where('name', 'Operasional')->first();
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@syncbudget.com'],
+            [
+                'name' => 'Felix',
+                'password' => Hash::make('password123'),
+                'division_id' => $divIT ? $divIT->id : null,
+            ]
+        );
         $admin->assignRole($adminRole);
 
-        // Akun Manajer (Untuk Approval)
-        $manager = User::create([
-            'name' => 'Manajer Keuangan',
-            'email' => 'manager@syncbudget.com',
-            'password' => Hash::make('password123'),
-        ]);
+        $manager = User::firstOrCreate(
+            ['email' => 'manager@syncbudget.com'],
+            [
+                'name' => 'Manajer Keuangan',
+                'password' => Hash::make('password123'),
+                'division_id' => $divKeuangan ? $divKeuangan->id : null,
+            ]
+        );
         $manager->assignRole($managerRole);
 
-        // Akun Staf (Untuk Pengajuan)
-        $staff = User::create([
-            'name' => 'Staf Operasional',
-            'email' => 'staff@syncbudget.com',
-            'password' => Hash::make('password123'),
-        ]);
+        $staff = User::firstOrCreate(
+            ['email' => 'staff@syncbudget.com'],
+            [
+                'name' => 'Staf Operasional',
+                'password' => Hash::make('password123'),
+                'division_id' => $divOperasional ? $divOperasional->id : null,
+            ]
+        );
         $staff->assignRole($staffRole);
     }
 }
