@@ -17,7 +17,7 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 
 ## Log Perubahan (Changelog)
 
-### [20 Maret 2026] - Initial Backend & Auth Foundation
+### [20 Maret 2026] - Initial Backend, Auth & Core Features Foundation
 **By:** @jevonkagenou
 
 * **Database Setup:** Migrasi ke PostgreSQL dan implementasi skema tabel inti.
@@ -25,4 +25,8 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 * **Authentication:** Sistem Login/Logout dengan proteksi Middleware dan logika *Role-based redirection*.
 * **UI Restructuring:** Refaktor Master Layout Sneat menggunakan Blade Components (`@include` & `@extends`).
 * **User Feedback:** Implementasi notifikasi Toast (Bootstrap 5) dan SweetAlert2 untuk UX yang lebih modern.
-* **Data Seeding:** Pembuatan akun *tester* otomatis untuk mempermudah fase pengembangan.
+* **Master Data Management:** Pembuatan antarmuka dan logika CRUD lengkap untuk mengelola data Divisi.
+* **Secure Data Import:** Fitur import data pengguna massal via Excel/CSV yang dilengkapi sanitasi anti-CSV Injection dan *auto-create* divisi.
+* **Audit Trail (Activity Log):** Integrasi `spatie/laravel-activitylog` (dengan kustomisasi UUID) untuk merekam seluruh jejak perubahan data secara diam-diam dan otomatis.
+* **Data Integrity:** Penerapan `SoftDeletes` pada model User untuk mengamankan riwayat transaksi dari penghapusan permanen (mencegah *orphan records*).
+* **Data Seeding:** Pembuatan akun *tester* otomatis dan `DivisionSeeder` yang sudah saling berelasi utuh untuk mempermudah fase pengembangan.
