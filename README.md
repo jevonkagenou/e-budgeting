@@ -17,6 +17,20 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 
 ## Log Perubahan (Changelog)
 
+### [21 Maret 2026] - Master Budgeting, Reimbursement Engine & Global Localization
+**By:** @jevonkagenou
+
+* **Master Budget Management:** Pembuatan antarmuka dan logika CRUD untuk Pagu Anggaran Divisi, dilengkapi dengan *Progress Bar* visual yang dinamis (indikator warna berubah berdasarkan persentase dana terpakai).
+* **Core Reimbursement Engine:** Implementasi sistem Pengajuan Dana (Reimbursement) dari nol hingga *production-ready* dengan *Role-Based Access Control* (Staff mengajukan, Manager/Admin menyetujui/menolak).
+* **Financial Automation:** Penerapan *Business Logic* untuk memotong saldo anggaran (`used_amount`) secara otomatis saat pengajuan disetujui, lengkap dengan validasi proteksi saldo tidak cukup.
+* **RESTful Routing Refactor:** Restrukturisasi *URL prefix* dari *role-based* menjadi *resource-based* (fungsional murni) agar lebih profesional dan sesuai standar *Enterprise*.
+* **Global Localization & Timezone:** Konfigurasi zona waktu sistem ke `Asia/Jakarta` (WIB) dan translasi penuh file `validation.php` bawaan Laravel ke Bahasa Indonesia yang baku.
+* **UI/UX Polishing:** Perbaikan struktur tabel responsif (menghilangkan *horizontal scroll*), perbaikan *rendering* Modal Bootstrap, dan implementasi *SweetAlert2* untuk konfirmasi tindakan finansial yang krusial.
+* **Advanced Data Filtering:** Penambahan fitur *Search* (pencarian multi-kolom) dan *Filter* berdasarkan Status pada modul *Activity Log* dan *Reimbursement*.
+* **Data Seeding & Audit Trail:** Pembuatan `BudgetSeeder` dan `ReimbursementSeeder` berskenario lengkap, serta memastikan setiap transaksi finansial terekam otomatis oleh Spatie Activitylog dengan format bahasa Indonesia.
+
+---
+
 ### [20 Maret 2026] - Initial Backend, Auth & Core Features Foundation
 **By:** @jevonkagenou
 

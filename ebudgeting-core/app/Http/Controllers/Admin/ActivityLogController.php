@@ -11,17 +11,31 @@ class ActivityLogController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
         $query = Activity::with('causer');
 
-        if ($search) {
-            $query->where('description', 'ilike', "%{$search}%")
-            ->orWhereHas('causer', function ($q) use ($search) {
-                    $q->where('name', 'ilike', "%{$search}%");
-                    });
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
         }
 
-        $logs = $query->latest()->paginate(15);
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
 
-        return view('admin.logs.index', compact('logs', 'search'));
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhere('subject_type', 'like', "%{$search}%")
+                  ->orWhereHas('causer', function ($qCauser) use ($search) {
+                      $qCauser->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $logs = $query->latest()->paginate(10);
+
+        return view('admin.logs.index', compact('logs', 'search', 'startDate', 'endDate'));
     }
 }

@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\ReimbursementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,10 +17,9 @@ Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rute Super Admin
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'role:admin']);
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', function () { return view('admin.dashboard'); })->name('admin.dashboard');
+
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
     Route::get('/users/template', [UserController::class, 'template'])->name('admin.users.template');
@@ -35,11 +36,27 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 });
 
 // Rute Manajer
-Route::get('/manager/dashboard', function () {
-    return view('manager.dashboard');
-})->middleware(['auth', 'role:manager']);
+Route::middleware(['auth', 'role:manager'])->prefix('manager')->group(function () {
+    Route::get('/dashboard', function () { return view('manager.dashboard'); })->name('manager.dashboard');
+});
 
 // Rute  Staff
-Route::get('/staff/dashboard', function () {
-    return view('staff.dashboard');
-})->middleware(['auth', 'role:staff']);
+Route::middleware(['auth', 'role:staff'])->prefix('staff')->group(function () {
+    Route::get('/dashboard', function () { return view('staff.dashboard'); })->name('staff.dashboard');
+});
+
+// Rute Admin|Manager untuk manajemen anggaran
+Route::middleware(['auth', 'role:admin|manager'])->prefix('budgets')->group(function () {
+    Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
+    Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
+    Route::put('/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update');
+    Route::delete('/budgets/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+});
+
+// Rute untuk pengajuan reimbursement (Admin & Staff bisa buat, Admin & Manager bisa approve/reject)
+Route::middleware(['auth'])->prefix('reimbursements')->name('reimbursements.')->group(function () {
+    Route::get('/', [ReimbursementController::class, 'index'])->name('index');
+    Route::post('/', [ReimbursementController::class, 'store'])->name('store')->middleware('role:admin|staff');
+    Route::put('/{id}/approve', [ReimbursementController::class, 'approve'])->name('approve')->middleware('role:admin|manager');
+    Route::put('/{id}/reject', [ReimbursementController::class, 'reject'])->name('reject')->middleware('role:admin|manager');
+});

@@ -58,8 +58,18 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        <li class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
-            <a href="{{ url('admin/dashboard') }}" class="menu-link">
+
+        @php
+            $dashboardRoute = route('staff.dashboard'); // Default
+            if (Auth::user()->hasRole('admin')) {
+                $dashboardRoute = route('admin.dashboard');
+            } elseif (Auth::user()->hasRole('manager')) {
+                $dashboardRoute = route('manager.dashboard');
+            }
+        @endphp
+
+        <li class="menu-item {{ request()->is('*/dashboard') ? 'active' : '' }}">
+            <a href="{{ $dashboardRoute }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Analytics">Dashboard</div>
             </a>
@@ -85,12 +95,30 @@
             </li>
         @endif
 
-        <li class="menu-item {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
-            <a href="{{ route('admin.logs.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-history"></i>
-                <div data-i18n="Log Aktivitas">Log Aktivitas</div>
+        @if (Auth::user()->hasAnyRole(['admin', 'manager']))
+            <li class="menu-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
+                <a href="{{ route('budgets.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-wallet"></i>
+                    <div data-i18n="Anggaran">Anggaran Divisi</div>
+                </a>
+            </li>
+        @endif
+
+        <li class="menu-item {{ request()->routeIs('reimbursements.*') ? 'active' : '' }}">
+            <a href="{{ route('reimbursements.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-money"></i>
+                <div data-i18n="Pengajuan Dana">Pengajuan Dana</div>
             </a>
         </li>
+
+        @if (Auth::user()->hasRole('admin'))
+            <li class="menu-item {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.logs.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-history"></i>
+                    <div data-i18n="Log Aktivitas">Log Aktivitas</div>
+                </a>
+            </li>
+        @endif
 
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Sistem</span></li>
         <li class="menu-item">

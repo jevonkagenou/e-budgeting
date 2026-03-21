@@ -4,16 +4,29 @@
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sistem /</span> Log Aktivitas</h4>
 
     <div class="card">
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3">
             <h5 class="mb-3 mb-md-0">Riwayat Sistem (Audit Trail)</h5>
-            <div class="d-flex flex-column flex-md-row align-items-center gap-3">
-                <form action="{{ route('admin.logs.index') }}" method="GET" class="input-group input-group-merge"
-                    style="width: 250px;">
+
+            <form action="{{ route('admin.logs.index') }}" method="GET" class="d-flex flex-column flex-md-row gap-2">
+                <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control"
+                    title="Tanggal Awal">
+
+                <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control"
+                    title="Tanggal Akhir">
+
+                <div class="input-group input-group-merge" style="min-width: 250px;">
                     <span class="input-group-text"><i class="bx bx-search"></i></span>
                     <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                        placeholder="Cari aktivitas...">
-                </form>
-            </div>
+                        placeholder="Cari aktivitas/pelaku...">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Filter</button>
+                @if (request('search') || request('start_date') || request('end_date'))
+                    <a href="{{ route('admin.logs.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
+                        <i class="bx bx-refresh"></i> Reset
+                    </a>
+                @endif
+            </form>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -49,7 +62,8 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-4">Belum ada riwayat aktivitas yang tercatat.</td>
+                            <td colspan="5" class="text-center py-4">Belum ada riwayat aktivitas yang tercatat atau
+                                sesuai dengan filter.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -58,7 +72,7 @@
 
         @if ($logs->hasPages())
             <div class="card-footer d-flex justify-content-center pb-0">
-                {{ $logs->appends(['search' => request('search')])->links() }}
+                {{ $logs->appends(request()->query())->links() }}
             </div>
         @endif
     </div>

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Imports\UsersImport;
-use App\Models\Division;
 use App\Models\User;
+use App\Models\Division;
 use Illuminate\Http\Request;
+use App\Imports\UsersImport;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
@@ -114,12 +115,13 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (auth()->id() == $user->id) {
+        if (Auth::id() == $user->id) { {
             return back()->with('error', 'Akses Ditolak! Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         $user->delete();
 
         return back()->with('success', 'Data pengguna berhasil dihapus secara permanen!');
+        }
     }
 }
