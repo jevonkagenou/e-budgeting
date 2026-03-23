@@ -14,12 +14,12 @@ class Budget extends Model
     use HasFactory, SoftDeletes, HasUuids, LogsActivity;
 
     protected $fillable = [
+        'fiscal_year_id',
         'division_id',
+        'budget_category_id',
         'name',
         'total_amount',
         'used_amount',
-        'start_date',
-        'end_date',
         'created_by',
     ];
 
@@ -35,6 +35,16 @@ class Budget extends Model
     public function division()
     {
         return $this->belongsTo(Division::class);
+    }
+
+    public function budgetCategory()
+    {
+        return $this->belongsTo(BudgetCategory::class);
+    }
+
+    public function fiscalYear()
+    {
+        return $this->belongsTo(FiscalYear::class);
     }
 
     public function creator()

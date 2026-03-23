@@ -17,6 +17,19 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 
 ## Log Perubahan (Changelog)
 
+### [23 Maret 2026] - Database Normalization, Transaction Locking & Automated PDF Reporting
+**By:** @jevonkagenou
+
+* **Database Normalization & Multi-Year Support:** Pemisahan tabel `fiscal_years` dan `budget_categories` untuk mendukung arsitektur *enterprise* sehingga mencegah fragmentasi data lintas tahun anggaran.
+* **Master Data Management Expansion:** Penambahan antarmuka, kontroler, rute, dan menu Sidebar untuk mengelola data master *Tahun Anggaran* dan *Kategori Anggaran* secara penuh menggunakan sistem *Modal* Bootstrap.
+* **Pre-emptive Budget Locking:** Implementasi pengamanan tingkat lanjut menggunakan `DB::transaction()` dan `lockForUpdate()` pada proses *approval* untuk mengunci baris data di PostgreSQL, memastikan saldo divisi aman dari kebocoran akibat *race condition*.
+* **Automated LPJ PDF Generation:** Integrasi `barryvdh/laravel-dompdf` untuk mencetak Laporan Pertanggungjawaban. Dilengkapi dengan desain *Modern Corporate* khusus ukuran A4 Landscape dan kapabilitas filter berdasarkan rentang tanggal persetujuan.
+* **Context-Aware UI/UX:** Optimalisasi antarmuka pengguna dengan menyembunyikan tombol aksi ke dalam menu *dropdown* pada tabel yang padat data (mencegah *horizontal scroll*), namun mempertahankan tombol langsung pada tabel master untuk efisiensi klik.
+* **Seeder Synchronization:** Restrukturisasi total pada `BudgetSeeder` dan `ReimbursementSeeder` agar sepenuhnya kompatibel dengan skema UUID relasional yang baru dan terintegrasi mulus dengan *Master Data*.
+* **Query Optimization & Bug Fixes:** Perbaikan *N+1 query problem* menggunakan *eager loading* relasi bersarang, perbaikan logika filter tanggal (menggunakan `whereHas`), dan resolusi konflik *namespace facade* PDF.
+
+---
+
 ### [21 Maret 2026] - Master Budgeting, Reimbursement Engine & Global Localization
 **By:** @jevonkagenou
 

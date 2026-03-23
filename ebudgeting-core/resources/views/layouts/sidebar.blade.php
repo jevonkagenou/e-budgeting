@@ -95,6 +95,20 @@
             </li>
         @endif
 
+        <li class="menu-item {{ request()->routeIs('admin.fiscal_years.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.fiscal_years.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-calendar"></i>
+                    <div data-i18n="Tahun Anggaran">Tahun Anggaran</div>
+                </a>
+            </li>
+
+            <li class="menu-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.categories.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-collection"></i>
+                    <div data-i18n="Kategori">Kategori Anggaran</div>
+                </a>
+            </li>
+
         @if (Auth::user()->hasAnyRole(['admin', 'manager']))
             <li class="menu-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">
                 <a href="{{ route('budgets.index') }}" class="menu-link">

@@ -33,6 +33,11 @@
             <h5 class="mb-0">Daftar Pengajuan Dana</h5>
 
             <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+                @hasanyrole('manager|admin')
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal">
+                        <i class="bx bxs-file-pdf me-1"></i> Export LPJ
+                    </button>
+                @endhasanyrole
                 <form action="{{ route('reimbursements.index') }}" method="GET" class="d-flex gap-2">
                     <select name="status" class="form-select" style="width: 160px;" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
@@ -154,7 +159,8 @@
                         @csrf @method('PUT')
                         <div class="modal-header">
                             <h5 class="modal-title text-danger">Tolak Pengajuan Dana</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <p>Anda akan menolak pengajuan <strong>{{ $item->title }}</strong> senilai Rp
@@ -228,6 +234,37 @@
                 <div class="modal-footer mt-3">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exportPdfModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="{{ route('reimbursements.export.pdf') }}" method="GET" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Export Laporan PDF (LPJ)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-4">
+                        Biarkan tanggal kosong jika ingin mencetak seluruh data historis yang telah disetujui.
+                    </div>
+                    <div class="row g-2">
+                        <div class="col mb-0">
+                            <label class="form-label">Mulai Tanggal (Disetujui)</label>
+                            <input type="date" name="start_date" class="form-control" />
+                        </div>
+                        <div class="col mb-0">
+                            <label class="form-label">Sampai Tanggal (Disetujui)</label>
+                            <input type="date" name="end_date" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger"><i class="bx bxs-file-pdf me-1"></i> Download
+                        PDF</button>
                 </div>
             </form>
         </div>

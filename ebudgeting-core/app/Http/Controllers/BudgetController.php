@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Budget;
 use App\Models\Division;
+use App\Models\FiscalYear;
+use App\Models\BudgetCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,25 +15,35 @@ class BudgetController extends Controller
     {
         $search = $request->input('search');
 
-        $query = Budget::with(['division', 'creator']);
+        $query = Budget::with(['division', 'creator', 'fiscalYear', 'budgetCategory']);
 
         if ($search) {
             $query->where('name', 'ilike', "%{$search}%")
-            ->orWhereHas('division', function ($q) use ($search) {
-                $q->where('name', 'ilike', "%{$search}%");
+                ->orWhereHas('division', function ($q) use ($search) {
+                    $q->where('name', 'ilike', "%{$search}%");
+                })
+                ->orWhereHas('budgetCategory', function ($q) use ($search) {
+                    $q->where('name', 'ilike', "%{$search}%");
+                })
+                ->orWhereHas('fiscalYear', function ($q) use ($search) {
+                    $q->where('year', 'ilike', "%{$search}%");
                 });
         }
 
         $budgets = $query->latest()->paginate(10);
 
         $divisions = Division::all();
+        $fiscalYears = FiscalYear::orderBy('year', 'desc')->get();
+        $categories = BudgetCategory::all();
 
-        return view('budgets.index', compact('budgets', 'divisions', 'search'));
+        return view('budgets.index', compact('budgets', 'divisions', 'fiscalYears', 'categories', 'search'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'fiscal_year_id' => 'required|exists:fiscal_years,id',
+            'budget_category_id' => 'required|exists:budget_categories,id',
             'division_id' => 'required|exists:divisions,id',
             'name' => 'required|string|max:255',
             'total_amount' => 'required|numeric|min:0',
@@ -40,6 +52,8 @@ class BudgetController extends Controller
         ]);
 
         Budget::create([
+            'fiscal_year_id' => $request->fiscal_year_id,
+            'budget_category_id' => $request->budget_category_id,
             'division_id' => $request->division_id,
             'name' => $request->name,
             'total_amount' => $request->total_amount,
@@ -57,6 +71,8 @@ class BudgetController extends Controller
         $budget = Budget::findOrFail($id);
 
         $request->validate([
+            'fiscal_year_id' => 'required|exists:fiscal_years,id',
+            'budget_category_id' => 'required|exists:budget_categories,id',
             'division_id' => 'required|exists:divisions,id',
             'name' => 'required|string|max:255',
             'total_amount' => 'required|numeric|min:' . $budget->used_amount,
@@ -65,6 +81,8 @@ class BudgetController extends Controller
         ]);
 
         $budget->update([
+            'fiscal_year_id' => $request->fiscal_year_id,
+            'budget_category_id' => $request->budget_category_id,
             'division_id' => $request->division_id,
             'name' => $request->name,
             'total_amount' => $request->total_amount,

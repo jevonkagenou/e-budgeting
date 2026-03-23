@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\BudgetCategoryController;
 use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\FiscalYearController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
@@ -32,6 +34,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::put('/divisions/{id}', [DivisionController::class, 'update'])->name('admin.divisions.update');
     Route::delete('/divisions/{id}', [DivisionController::class, 'destroy'])->name('admin.divisions.destroy');
 
+    Route::get('/fiscal-years', [FiscalYearController::class, 'index'])->name('admin.fiscal_years.index');
+    Route::post('/fiscal-years', [FiscalYearController::class, 'store'])->name('admin.fiscal_years.store');
+    Route::put('/fiscal-years/{id}', [FiscalYearController::class, 'update'])->name('admin.fiscal_years.update');
+    Route::delete('/fiscal-years/{id}', [FiscalYearController::class, 'destroy'])->name('admin.fiscal_years.destroy');
+
+    Route::get('/categories', [BudgetCategoryController::class, 'index'])->name('admin.categories.index');
+    Route::post('/categories', [BudgetCategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/categories/{id}', [BudgetCategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/categories/{id}', [BudgetCategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
     Route::get('/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
 });
 
@@ -59,4 +71,6 @@ Route::middleware(['auth'])->prefix('reimbursements')->name('reimbursements.')->
     Route::post('/', [ReimbursementController::class, 'store'])->name('store')->middleware('role:admin|staff');
     Route::put('/{id}/approve', [ReimbursementController::class, 'approve'])->name('approve')->middleware('role:admin|manager');
     Route::put('/{id}/reject', [ReimbursementController::class, 'reject'])->name('reject')->middleware('role:admin|manager');
+
+    Route::get('/export-pdf', [ReimbursementController::class, 'exportPdf'])->name('export.pdf')->middleware('role:admin|manager');
 });

@@ -6,6 +6,7 @@ use App\Models\Budget;
 use App\Models\Reimbursement;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ReimbursementSeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class ReimbursementSeeder extends Seeder
         if (!$staff || !$manager) {
             return;
         }
+
         $budget = Budget::where('division_id', $staff->division_id)->first();
 
         if (!$budget) {
@@ -56,11 +58,17 @@ class ReimbursementSeeder extends Seeder
             ]
         ];
 
-        foreach ($reimbursements as $data) {
-            Reimbursement::firstOrCreate(
-                ['title' => $data['title']],
-                $data
-            );
-        }
+        DB::transaction(function () use ($reimbursements, $budget) {
+            foreach ($reimbursements as $data) {
+                $reimbursement = Reimbursement::firstOrCreate(
+                    ['title' => $data['title']],
+                    $data
+                );
+
+                if ($reimbursement->wasRecentlyCreated && $reimbursement->status === 'approved') {
+                    $budget->lockForUpdate()->increment('used_amount', $reimbursement->amount);
+                }
+            }
+        });
     }
 }

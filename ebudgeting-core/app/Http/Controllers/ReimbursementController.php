@@ -6,6 +6,8 @@ use App\Models\Budget;
 use App\Models\Reimbursement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReimbursementController extends Controller
 {
@@ -15,7 +17,7 @@ class ReimbursementController extends Controller
         $search = $request->input('search');
         $status = $request->input('status');
 
-        $query = Reimbursement::with(['user.division', 'budget', 'actionBy'])->latest();
+        $query = Reimbursement::with(['user.division', 'budget.fiscalYear', 'actionBy'])->latest();
 
         /** @var \App\Models\User $user */
         if ($user->hasRole('staff')) {
@@ -28,7 +30,7 @@ class ReimbursementController extends Controller
                   ->orWhere('description', 'ilike', "%{$search}%")
                   ->orWhereHas('user', function ($u) use ($search) {
                       $u->where('name', 'ilike', "%{$search}%");
-                      });
+                  });
             });
         }
 
@@ -38,7 +40,11 @@ class ReimbursementController extends Controller
 
         $reimbursements = $query->paginate(10);
 
-        $budgetsQuery = Budget::whereDate('end_date', '>=', now())
+        // Perbaikan: Cek end_date melalui relasi fiscalYear
+        $budgetsQuery = Budget::whereHas('fiscalYear', function ($q) {
+                $q->whereDate('end_date', '>=', now())
+                  ->where('is_active', true);
+            })
             ->whereRaw('total_amount > used_amount');
 
         if (!$user->hasRole('admin')) {
@@ -80,29 +86,34 @@ class ReimbursementController extends Controller
 
     public function approve($id)
     {
-        $reimbursement = Reimbursement::findOrFail($id);
+        return DB::transaction(function () use ($id) {
+            $reimbursement = Reimbursement::findOrFail($id);
 
-        if ($reimbursement->status !== 'pending') {
-            return back()->with('error', 'Status pengajuan sudah diproses sebelumnya!');
-        }
+            if ($reimbursement->status !== 'pending') {
+                return back()->with('error', 'Status pengajuan sudah diproses sebelumnya!');
+            }
 
-        $budget = $reimbursement->budget;
-        $remainingBalance = $budget->total_amount - $budget->used_amount;
+            $budget = Budget::where('id', $reimbursement->budget_id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if ($remainingBalance < $reimbursement->amount) {
-            return back()->with('error', 'Gagal menyetujui! Sisa saldo anggaran tidak mencukupi untuk nominal ini.');
-        }
+            $remainingBalance = $budget->total_amount - $budget->used_amount;
 
-        $budget->update([
-            'used_amount' => $budget->used_amount + $reimbursement->amount
-        ]);
+            if ($remainingBalance < $reimbursement->amount) {
+                return back()->with('error', 'Gagal menyetujui! Sisa saldo anggaran tidak mencukupi untuk nominal ini.');
+            }
 
-        $reimbursement->update([
-            'status' => 'approved',
-            'action_by' => Auth::id(),
-        ]);
+            $budget->update([
+                'used_amount' => $budget->used_amount + $reimbursement->amount
+            ]);
 
-        return back()->with('success', 'Pengajuan disetujui! Saldo anggaran otomatis terpotong.');
+            $reimbursement->update([
+                'status' => 'approved',
+                'action_by' => Auth::id(),
+            ]);
+
+            return back()->with('success', 'Pengajuan disetujui! Saldo anggaran otomatis terpotong.');
+        });
     }
 
     public function reject(Request $request, $id)
@@ -124,5 +135,26 @@ class ReimbursementController extends Controller
         ]);
 
         return back()->with('success', 'Pengajuan dana berhasil ditolak.');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $query = Reimbursement::with(['user.division', 'budget.fiscalYear', 'budget.budgetCategory', 'actionBy'])
+            ->where('status', 'approved');
+
+        if ($request->has('start_date') && $request->start_date != '') {
+            $query->whereDate('updated_at', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && $request->end_date != '') {
+            $query->whereDate('updated_at', '<=', $request->end_date);
+        }
+
+        $reimbursements = $query->latest('updated_at')->get();
+
+        $pdf = Pdf::loadView('reimbursements.laporan_pdf', compact('reimbursements', 'request'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('LPJ_Reimbursement_' . date('Ymd_His') . '.pdf');
     }
 }
