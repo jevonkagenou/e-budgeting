@@ -17,7 +17,7 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 
 ## Log Perubahan (Changelog)
 
-### [23 Maret 2026] - Database Normalization, Transaction Locking & Automated PDF Reporting
+### [23 Maret 2026] - Enterprise Architecture, Soft Deletes, & Advanced UI Integration
 **By:** @jevonkagenou
 
 * **Database Normalization & Multi-Year Support:** Pemisahan tabel `fiscal_years` dan `budget_categories` untuk mendukung arsitektur *enterprise* sehingga mencegah fragmentasi data lintas tahun anggaran.
@@ -26,7 +26,10 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 * **Automated LPJ PDF Generation:** Integrasi `barryvdh/laravel-dompdf` untuk mencetak Laporan Pertanggungjawaban. Dilengkapi dengan desain *Modern Corporate* khusus ukuran A4 Landscape dan kapabilitas filter berdasarkan rentang tanggal persetujuan.
 * **Context-Aware UI/UX:** Optimalisasi antarmuka pengguna dengan menyembunyikan tombol aksi ke dalam menu *dropdown* pada tabel yang padat data (mencegah *horizontal scroll*), namun mempertahankan tombol langsung pada tabel master untuk efisiensi klik.
 * **Seeder Synchronization:** Restrukturisasi total pada `BudgetSeeder` dan `ReimbursementSeeder` agar sepenuhnya kompatibel dengan skema UUID relasional yang baru dan terintegrasi mulus dengan *Master Data*.
-* **Query Optimization & Bug Fixes:** Perbaikan *N+1 query problem* menggunakan *eager loading* relasi bersarang, perbaikan logika filter tanggal (menggunakan `whereHas`), dan resolusi konflik *namespace facade* PDF.
+* **Multi-Division Manager Architecture:** Implementasi relasi *Many-to-Many* melalui tabel pivot `manager_divisions` (UUID-based), memungkinkan satu akun level Manajer untuk mengawasi dan menyetujui anggaran dari banyak divisi sekaligus.
+* **Enterprise-Grade Form UI:** Integrasi *library* Select2 untuk pencarian *dropdown* yang intuitif (*Single* & *Multi-select*) di dalam Modal Bootstrap, serta penerapan *Inline Truncation* dengan Tooltip untuk merapikan tampilan *badge* data yang panjang.
+* **Data Integrity & Soft Deletes Implementation:** Mengamankan seluruh data historis dan laporan (LPJ) dari kerusakan akibat penghapusan data master (*Cascade Delete*) dengan menerapkan `SoftDeletes` secara global dan mengamankan relasi menggunakan `withTrashed()`.
+* **Query Optimization & Bug Fixes:** Resolusi *N+1 query problem* via *eager loading*, perbaikan filter tanggal, penyelesaian konflik *namespace facade* PDF, pembersihan migrasi ganda, dan penyesuaian aturan `Unique Index` PostgreSQL agar mendukung *Soft Deletes*.
 
 ---
 

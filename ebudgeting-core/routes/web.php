@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\FiscalYearController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReimbursementController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +21,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rute Super Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () { return view('admin.dashboard'); })->name('admin.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
 
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -49,12 +50,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
 // Rute Manajer
 Route::middleware(['auth', 'role:manager'])->prefix('manager')->group(function () {
-    Route::get('/dashboard', function () { return view('manager.dashboard'); })->name('manager.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
 });
 
 // Rute  Staff
 Route::middleware(['auth', 'role:staff'])->prefix('staff')->group(function () {
-    Route::get('/dashboard', function () { return view('staff.dashboard'); })->name('staff.dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'staff'])->name('staff.dashboard');
 });
 
 // Rute Admin|Manager untuk manajemen anggaran

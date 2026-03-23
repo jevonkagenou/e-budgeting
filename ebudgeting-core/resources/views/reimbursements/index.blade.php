@@ -69,7 +69,7 @@
                         <th>Pengaju & Divisi</th>
                         <th>Tujuan Anggaran</th>
                         <th>Keterangan</th>
-                        <th>Nominal (Rp)</th>
+                        <th>Nominal</th>
                         <th>Status</th>
                         @hasanyrole('manager|admin')
                             <th>Aksi</th>
@@ -79,7 +79,7 @@
                 <tbody class="table-border-bottom-0">
                     @forelse($reimbursements as $item)
                         <tr>
-                            <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</td>
                             <td>
                                 <strong>{{ $item->user->name }}</strong><br>
                                 <small class="text-muted">{{ $item->user->division->name ?? '-' }}</small>
@@ -100,7 +100,7 @@
                                         {{ $item->rejection_reason }}</small>
                                 @endif
                             </td>
-                            <td class="fw-semibold">{{ number_format($item->amount, 0, ',', '.') }}</td>
+                            <td class="fw-semibold text-nowrap">Rp {{ number_format($item->amount, 0, ',', '.') }}</td>
                             <td>
                                 @if ($item->status === 'pending')
                                     <span class="badge bg-warning">Menunggu</span>
@@ -198,7 +198,7 @@
                                 <option value="">-- Pilih Dompet Anggaran --</option>
                                 @foreach ($budgets as $budget)
                                     <option value="{{ $budget->id }}">
-                                        {{ $budget->name }} (Sisa: Rp
+                                        {{ $budget->name }} (TA: {{ $budget->fiscalYear->year ?? '-' }} | Sisa: Rp
                                         {{ number_format($budget->total_amount - $budget->used_amount, 0, ',', '.') }})
                                     </option>
                                 @endforeach

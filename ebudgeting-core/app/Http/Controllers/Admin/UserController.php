@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -20,7 +21,7 @@ class UserController extends Controller
 
         $query = User::whereDoesntHave('roles', function ($q) {
             $q->where('name', 'admin');
-        });
+        })->with('managedDivisions');
 
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -40,10 +41,15 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => [
+                'required', 'string', 'email', 'max:255',
+                Rule::unique('users')->whereNull('deleted_at')
+            ],
             'password' => 'required|string|min:8',
             'role' => 'required|exists:roles,name',
-            'division_id' => 'required|exists:divisions,id'
+            'division_id' => 'required|exists:divisions,id',
+            'managed_divisions' => 'nullable|array',
+            'managed_divisions.*' => 'exists:divisions,id'
         ]);
 
         $user = User::create([
@@ -54,6 +60,10 @@ class UserController extends Controller
         ]);
 
         $user->assignRole($request->role);
+
+        if ($request->role === 'manager' && $request->has('managed_divisions')) {
+            $user->managedDivisions()->sync($request->managed_divisions);
+        }
 
         return back()->with('success', 'Pengguna berhasil ditambahkan!');
     }
@@ -89,10 +99,15 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => [
+                'required', 'string', 'email', 'max:255',
+                Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')
+            ],
             'password' => 'nullable|string|min:8',
             'role' => 'required|exists:roles,name',
-            'division_id' => 'required|exists:divisions,id'
+            'division_id' => 'required|exists:divisions,id',
+            'managed_divisions' => 'nullable|array',
+            'managed_divisions.*' => 'exists:divisions,id'
         ]);
 
         $updateData = [
@@ -108,6 +123,12 @@ class UserController extends Controller
         $user->update($updateData);
         $user->syncRoles([$request->role]);
 
+        if ($request->role === 'manager') {
+            $user->managedDivisions()->sync($request->managed_divisions ?? []);
+        } else {
+            $user->managedDivisions()->detach();
+        }
+
         return back()->with('success', 'Data pengguna berhasil diperbarui!');
     }
 
@@ -115,13 +136,12 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() == $user->id) { {
+        if (Auth::id() == $user->id) {
             return back()->with('error', 'Akses Ditolak! Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         $user->delete();
 
         return back()->with('success', 'Data pengguna berhasil dihapus secara permanen!');
-        }
     }
 }

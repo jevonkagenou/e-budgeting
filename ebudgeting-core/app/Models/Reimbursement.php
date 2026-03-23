@@ -36,16 +36,16 @@ class Reimbursement extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
     public function budget()
     {
-        return $this->belongsTo(Budget::class, 'budget_id');
+        return $this->belongsTo(Budget::class, 'budget_id')->withTrashed();
     }
 
     public function actionBy()
     {
-        return $this->belongsTo(User::class, 'action_by');
+        return $this->belongsTo(User::class, 'action_by')->withTrashed();
     }
 }

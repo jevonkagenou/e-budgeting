@@ -46,6 +46,11 @@ class User extends Authenticatable
 
     public function division()
     {
-        return $this->belongsTo(Division::class);
+        return $this->belongsTo(Division::class)->withTrashed();
+    }
+
+    public function managedDivisions()
+    {
+        return $this->belongsToMany(Division::class, 'manager_divisions', 'user_id', 'division_id')->withTrashed();
     }
 }

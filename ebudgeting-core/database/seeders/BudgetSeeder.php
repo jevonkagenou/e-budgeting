@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Budget;
 use App\Models\Division;
-use App\Models\User;
 use App\Models\FiscalYear;
 use App\Models\BudgetCategory;
 use Illuminate\Database\Seeder;
@@ -17,9 +16,7 @@ class BudgetSeeder extends Seeder
         $divIT = Division::where('name', 'IT & Development')->first();
         $divKeuangan = Division::where('name', 'Keuangan')->first();
         $divOperasional = Division::where('name', 'Operasional')->first();
-
-        $admin = User::where('email', 'admin@syncbudget.com')->first();
-        $manager = User::where('email', 'manager@syncbudget.com')->first();
+        $divHRD = Division::where('name', 'HRD')->first();
 
         $fiscalYear = FiscalYear::firstOrCreate(
             ['year' => '2026'],
@@ -33,8 +30,9 @@ class BudgetSeeder extends Seeder
         $catIT = BudgetCategory::firstOrCreate(['code' => 'IT-01'], ['name' => 'Infrastruktur & IT']);
         $catTaktis = BudgetCategory::firstOrCreate(['code' => 'FIN-01'], ['name' => 'Dana Taktis']);
         $catOps = BudgetCategory::firstOrCreate(['code' => 'OPS-01'], ['name' => 'Operasional Cabang']);
+        $catHR = BudgetCategory::firstOrCreate(['code' => 'HR-01'], ['name' => 'Pengembangan SDM']);
 
-        if ($admin && $manager && $divIT && $divKeuangan && $divOperasional) {
+        if ($divIT && $divKeuangan && $divOperasional && $divHRD) {
             $budgets = [
                 [
                     'fiscal_year_id' => $fiscalYear->id,
@@ -59,6 +57,14 @@ class BudgetSeeder extends Seeder
                     'name' => 'Anggaran Operasional Cabang',
                     'total_amount' => 200000000,
                     'used_amount' => 120000000,
+                ],
+                [
+                    'fiscal_year_id' => $fiscalYear->id,
+                    'budget_category_id' => $catHR->id,
+                    'division_id' => $divHRD->id,
+                    'name' => 'Anggaran Rekrutmen & Pelatihan',
+                    'total_amount' => 75000000,
+                    'used_amount' => 15000000,
                 ],
             ];
 

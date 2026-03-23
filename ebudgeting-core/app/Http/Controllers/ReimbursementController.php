@@ -22,6 +22,11 @@ class ReimbursementController extends Controller
         /** @var \App\Models\User $user */
         if ($user->hasRole('staff')) {
             $query->where('user_id', $user->id);
+        } elseif ($user->hasRole('manager')) {
+            $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+            $query->whereHas('user', function ($q) use ($managedDivisionIds) {
+                $q->whereIn('division_id', $managedDivisionIds);
+            });
         }
 
         if ($search) {
@@ -40,7 +45,6 @@ class ReimbursementController extends Controller
 
         $reimbursements = $query->paginate(10);
 
-        // Perbaikan: Cek end_date melalui relasi fiscalYear
         $budgetsQuery = Budget::whereHas('fiscalYear', function ($q) {
                 $q->whereDate('end_date', '>=', now())
                   ->where('is_active', true);

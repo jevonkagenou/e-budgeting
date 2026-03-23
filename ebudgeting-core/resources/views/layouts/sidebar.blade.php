@@ -60,7 +60,7 @@
     <ul class="menu-inner py-1">
 
         @php
-            $dashboardRoute = route('staff.dashboard'); // Default
+            $dashboardRoute = route('staff.dashboard');
             if (Auth::user()->hasRole('admin')) {
                 $dashboardRoute = route('admin.dashboard');
             } elseif (Auth::user()->hasRole('manager')) {
@@ -93,9 +93,8 @@
                     <div data-i18n="Pengguna">Pengguna</div>
                 </a>
             </li>
-        @endif
 
-        <li class="menu-item {{ request()->routeIs('admin.fiscal_years.*') ? 'active' : '' }}">
+            <li class="menu-item {{ request()->routeIs('admin.fiscal_years.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.fiscal_years.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-calendar"></i>
                     <div data-i18n="Tahun Anggaran">Tahun Anggaran</div>
@@ -108,6 +107,7 @@
                     <div data-i18n="Kategori">Kategori Anggaran</div>
                 </a>
             </li>
+        @endif
 
         @if (Auth::user()->hasAnyRole(['admin', 'manager']))
             <li class="menu-item {{ request()->routeIs('budgets.*') ? 'active' : '' }}">

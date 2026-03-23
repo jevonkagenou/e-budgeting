@@ -11,7 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::create('manager_divisions', function (Blueprint $table) {
+            $table->primary(['user_id', 'division_id']);
+            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('division_id')->constrained('divisions')->cascadeOnDelete();
+            $table->timestamps();
             $table->softDeletes();
         });
     }
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        Schema::dropIfExists('manager_divisions');
     }
 };

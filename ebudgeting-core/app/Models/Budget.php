@@ -34,21 +34,21 @@ class Budget extends Model
 
     public function division()
     {
-        return $this->belongsTo(Division::class);
+        return $this->belongsTo(Division::class)->withTrashed();
     }
 
     public function budgetCategory()
     {
-        return $this->belongsTo(BudgetCategory::class);
+        return $this->belongsTo(BudgetCategory::class)->withTrashed();
     }
 
     public function fiscalYear()
     {
-        return $this->belongsTo(FiscalYear::class);
+        return $this->belongsTo(FiscalYear::class)->withTrashed();
     }
 
     public function creator()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by')->withTrashed();
     }
 }
