@@ -216,14 +216,14 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label">Nama Anggaran</label>
+                            <label class="form-label">Nama Anggaran<span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control"
                                 placeholder="Contoh: Anggaran Q1 IT" required />
                         </div>
                     </div>
                     <div class="row g-2">
                         <div class="col mb-3">
-                            <label class="form-label">Tahun Anggaran</label>
+                            <label class="form-label">Tahun Anggaran<span class="text-danger">*</span></label>
                             <select name="fiscal_year_id" class="form-select" required>
                                 <option value="">-- Pilih Tahun --</option>
                                 @foreach ($fiscalYears as $year)
@@ -232,7 +232,7 @@
                             </select>
                         </div>
                         <div class="col mb-3">
-                            <label class="form-label">Kategori</label>
+                            <label class="form-label">Kategori<span class="text-danger">*</span></label>
                             <select name="budget_category_id" class="form-select" required>
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach ($categories as $cat)
@@ -243,7 +243,7 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label">Divisi</label>
+                            <label class="form-label">Divisi<span class="text-danger">*</span></label>
                             <select name="division_id" class="form-select" required>
                                 <option value="">-- Pilih Divisi --</option>
                                 @foreach ($divisions as $divisi)
@@ -254,7 +254,7 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label">Total Pagu (Rp)</label>
+                            <label class="form-label">Total Pagu (Rp)<span class="text-danger">*</span></label>
                             <input type="number" name="total_amount" class="form-control" placeholder="10000000"
                                 min="0" required />
                             <small class="text-muted">Masukkan angka saja tanpa titik/koma.</small>
@@ -262,11 +262,11 @@
                     </div>
                     <div class="row g-2">
                         <div class="col mb-0">
-                            <label class="form-label">Tanggal Mulai</label>
+                            <label class="form-label">Tanggal Mulai<span class="text-danger">*</span></label>
                             <input type="date" name="start_date" class="form-control" required />
                         </div>
                         <div class="col mb-0">
-                            <label class="form-label">Tanggal Berakhir</label>
+                            <label class="form-label">Tanggal Berakhir<span class="text-danger">*</span></label>
                             <input type="date" name="end_date" class="form-control" required />
                         </div>
                     </div>

@@ -3,6 +3,29 @@
 @section('content')
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sistem /</span> Manajemen Divisi</h4>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
             <h5 class="mb-3 mb-md-0">Daftar Divisi</h5>
@@ -112,7 +135,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label">Nama Divisi</label>
+                            <label class="form-label">Nama Divisi<span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control"
                                 placeholder="Contoh: HRD, Keuangan, IT" required />
                         </div>

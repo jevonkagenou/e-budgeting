@@ -17,6 +17,20 @@ Sistem ini menggunakan arsitektur *Client-Server*:
 
 ## Log Perubahan (Changelog)
 
+### [25 Maret 2026] - Enterprise API Foundation, Secure Identity Management & UX Refinement
+**By:** @jevonkagenou
+
+* **Mobile API Engine (Sanctum):** Implementasi *RESTful API* komprehensif menggunakan Laravel Sanctum untuk mendukung aplikasi *mobile*, mencakup otentikasi (Login/Logout) yang aman dan *Token Management*.
+* **Financial Core API & Data Aggregation:** Pengembangan *endpoint* pengajuan dana (*multipart/form-data*) dan penyatuan data Dasbor terpadu (metrik saldo, profil, riwayat) dalam satu *response* untuk meminimalisir *latency* pada *mobile client*.
+* **Race Condition Protection (API):** Sinkronisasi tingkat keamanan *Enterprise* pada rute persetujuan (Approve) API menggunakan `DB::transaction()` dan `lockForUpdate()`, memastikan integritas pemotongan saldo divisi terhindar dari *double-spending*.
+* **Cross-Platform Compliance Validation:** Penyelarasan *Business Logic* secara mutlak antara *Web Controller* dan *API Controller*, mewajibkan lampiran struk fisik (gambar) dan deskripsi untuk setiap pengajuan demi kepatuhan *audit trail* perusahaan.
+* **Secure Identity Management:** Pembuatan antarmuka dan logika pengelolaan Profil Web dengan sistem verifikasi berlapis, mewajibkan otentikasi kata sandi lama (*Current Password validation*) sebelum mengizinkan pembaruan kredensial.
+* **Navigational Architecture Refactor:** Restrukturisasi hierarki UI dengan memusatkan menu personal ke *Dropdown Navbar* (menggunakan *Flexbox Alignment* untuk presisi visual), serta membersihkan *Sidebar* agar eksklusif untuk modul operasional bisnis.
+* **Seamless Data Presentation:** Pembaruan antarmuka tabel Dasbor dengan mengintegrasikan *Bootstrap Modal* (menggantikan elemen *Collapse/SweetAlert*) untuk merender teks penolakan yang panjang secara terisolasi tanpa merusak struktur *grid* tabel.
+* **Event Handling Resolution:** Resolusi anomali *JavaScript event handler* (`undefined event`) pada eksekusi *Logout* Web, memastikan penahan *SweetAlert2* beroperasi sempurna sebelum melakukan destruksi sesi secara *server-side*.
+
+---
+
 ### [23 Maret 2026] - Enterprise Architecture, Soft Deletes, & Advanced UI Integration
 **By:** @jevonkagenou
 

@@ -99,8 +99,7 @@
     <script src="{{ asset('sneat/assets/js/main.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function confirmLogout(event) {
-            event.preventDefault();
+        function confirmLogout() {
             Swal.fire({
                 title: 'Keluar Aplikasi?',
                 text: "Sesi Anda akan diakhiri.",

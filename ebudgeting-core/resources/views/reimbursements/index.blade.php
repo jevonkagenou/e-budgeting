@@ -86,9 +86,9 @@
                             </td>
                             <td><span class="badge bg-label-info">{{ $item->budget->name }}</span></td>
                             <td style="white-space: normal; min-width: 250px;">
-                                {{ $item->title }}
+                                <strong>{{ $item->title }}</strong>
+                                <p class="text-muted mb-1" style="font-size: 0.85rem;">{{ $item->description }}</p>
                                 @if ($item->receipt_path)
-                                    <br>
                                     <a href="{{ asset('storage/' . $item->receipt_path) }}" target="_blank"
                                         class="text-primary fs-7 d-inline-flex align-items-center mt-1">
                                         <i class="bx bx-image me-1"></i> Lihat Struk
@@ -96,8 +96,12 @@
                                 @endif
                                 @if ($item->status === 'rejected' && $item->rejection_reason)
                                     <br>
-                                    <small class="text-danger mt-1 d-block"><i class="bx bx-error-circle"></i>
-                                        {{ $item->rejection_reason }}</small>
+                                    <a href="#" data-bs-toggle="modal"
+                                        data-bs-target="#reasonModal{{ $item->id }}"
+                                        class="text-danger fs-7 d-inline-flex align-items-center mt-1"
+                                        style="text-decoration: none;">
+                                        <i class="bx bx-error-circle me-1"></i> Lihat Alasan Penolakan
+                                    </a>
                                 @endif
                             </td>
                             <td class="fw-semibold text-nowrap">Rp {{ number_format($item->amount, 0, ',', '.') }}</td>
@@ -179,6 +183,28 @@
                 </div>
             </div>
         @endif
+
+        @if ($item->status === 'rejected' && $item->rejection_reason)
+            <div class="modal fade" id="reasonModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-danger"><i class="bx bx-error-circle me-1"></i>Alasan Penolakan
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-0 text-wrap" style="word-break: break-word;">{{ $item->rejection_reason }}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     @endforeach
 
     <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
@@ -219,15 +245,15 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label">Bukti Struk/Nota (Opsional)</label>
+                            <label class="form-label">Bukti Struk/Nota <span class="text-danger">*</span></label>
                             <input type="file" name="receipt" class="form-control"
-                                accept="image/jpeg, image/png, image/jpg" />
+                                accept="image/jpeg, image/png, image/jpg" required />
                         </div>
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label class="form-label">Keterangan Tambahan</label>
-                            <textarea name="description" class="form-control" rows="2"></textarea>
+                            <label class="form-label">Keterangan Tambahan <span class="text-danger">*</span></label>
+                            <textarea name="description" class="form-control" rows="2" required></textarea>
                         </div>
                     </div>
                 </div>

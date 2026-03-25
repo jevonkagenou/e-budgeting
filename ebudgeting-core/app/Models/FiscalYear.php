@@ -20,13 +20,22 @@ class FiscalYear extends Model
         'end_date',
     ];
 
+    protected static function booted()
+    {
+        static::saved(function ($fiscalYear) {
+            if ($fiscalYear->is_active) {
+                static::where('id', '!=', $fiscalYear->id)->update(['is_active' => false]);
+            }
+        });
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logFillable()
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Data pengguna telah di{$eventName}");
+            ->setDescriptionForEvent(fn(string $eventName) => "Data tahun anggaran telah di{$eventName}");
     }
 
     public function budgets()

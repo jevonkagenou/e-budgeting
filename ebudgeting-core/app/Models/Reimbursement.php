@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Storage;
 
 class Reimbursement extends Model
 {
@@ -24,6 +25,15 @@ class Reimbursement extends Model
         'action_by',
         'rejection_reason',
     ];
+
+    protected static function booted()
+    {
+        static::forceDeleted(function ($reimbursement) {
+            if ($reimbursement->receipt_path) {
+                Storage::disk('public')->delete($reimbursement->receipt_path);
+            }
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

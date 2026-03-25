@@ -10,71 +10,70 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
     <link rel="stylesheet" href="{{ asset('sneat/assets/vendor/css/core.css') }}" />
     <link rel="stylesheet" href="{{ asset('sneat/assets/css/demo.css') }}" />
 
     <style>
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 75px;
         }
 
         body {
             font-family: 'Public Sans', sans-serif;
-            background-color: #ffffff;
+            background-color: #f8f9fa;
             overflow-x: hidden;
+            color: #3a3b45;
+        }
+
+        section {
+            scroll-margin-top: 90px;
         }
 
         .navbar-landing {
-            background-color: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
         }
 
-        .hero-fullscreen {
+        .hero-section {
+            position: relative;
             min-height: 100vh;
             display: flex;
             align-items: center;
-            position: relative;
-            padding-top: 80px;
-            padding-bottom: 120px;
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            padding-top: 100px;
+            padding-bottom: 80px;
+            background-color: #ffffff;
+            background-image: radial-gradient(rgba(105, 108, 255, 0.05) 2px, transparent 2px);
+            background-size: 30px 30px;
             z-index: 1;
             overflow: hidden;
         }
 
-        .hero-blob-1 {
+        .hero-glow,
+        .hero-glow-2 {
             position: absolute;
-            top: -10%;
-            left: -5%;
-            width: 400px;
-            height: 400px;
-            background: rgba(105, 108, 255, 0.15);
+            z-index: -1;
             border-radius: 50%;
-            filter: blur(60px);
-            z-index: 0;
-            animation: pulseBlob 8s infinite alternate ease-in-out;
         }
 
-        .hero-blob-2 {
-            position: absolute;
-            bottom: -10%;
-            right: -5%;
+        .hero-glow {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(105, 108, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+            top: -10%;
+            left: -10%;
+        }
+
+        .hero-glow-2 {
             width: 500px;
             height: 500px;
-            background: rgba(0, 210, 255, 0.15);
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: 0;
-            animation: pulseBlob 10s infinite alternate-reverse ease-in-out;
-        }
-
-        @keyframes pulseBlob {
-            0% { transform: scale(1) translate(0, 0); opacity: 0.6; }
-            100% { transform: scale(1.1) translate(20px, -20px); opacity: 1; }
+            background: radial-gradient(circle, rgba(0, 210, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            bottom: -10%;
+            right: -5%;
         }
 
         .text-gradient {
@@ -82,88 +81,252 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            display: inline-block;
         }
 
-        .img-floating {
-            animation: floatImage 6s ease-in-out infinite;
+        .browser-mockup {
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+            transition: transform 0.5s ease;
         }
 
-        @keyframes floatImage {
-            0% { transform: perspective(1000px) rotateY(-5deg) translateY(0px); }
-            50% { transform: perspective(1000px) rotateY(-5deg) translateY(-20px); }
-            100% { transform: perspective(1000px) rotateY(-5deg) translateY(0px); }
+        .browser-mockup:hover {
+            transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+        }
+
+        .browser-header {
+            background: #f1f1f1;
+            padding: 10px 15px;
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .browser-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #ff5f56;
+        }
+
+        .dot-yellow {
+            background: #ffbd2e;
+        }
+
+        .dot-green {
+            background: #27c93f;
         }
 
         .btn-glow {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-glow:hover {
-            box-shadow: 0 8px 25px rgba(105, 108, 255, 0.5);
-            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px -5px rgba(105, 108, 255, 0.5);
+            transform: translateY(-2px);
         }
 
-        .content-section {
+        .section-padding {
             padding: 100px 0;
-            position: relative;
-            display: flex;
-            align-items: center;
         }
 
-        .custom-shape-divider-bottom {
+        .card-premium {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-premium::before {
+            content: '';
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
-            overflow: hidden;
-            line-height: 0;
-            z-index: 2;
+            height: 4px;
+            background: linear-gradient(90deg, #696cff, #00d2ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
         }
 
-        .custom-shape-divider-bottom svg {
-            position: relative;
-            display: block;
-            width: calc(100% + 1.3px);
-            height: 90px;
+        .card-premium:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -10px rgba(105, 108, 255, 0.15);
         }
 
-        .custom-shape-divider-bottom .shape-fill {
-            fill: #FFFFFF;
+        .card-premium:hover::before {
+            transform: scaleX(1);
         }
 
-        .feature-card {
-            transition: all 0.3s ease;
-            border: 1px solid #f0f2f5;
+        .icon-box {
+            width: 60px;
+            height: 60px;
             border-radius: 12px;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(105, 108, 255, 0.1);
-            border-color: #696cff;
-        }
-
-        .step-circle {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background-color: #e7e7ff;
+            background: rgba(105, 108, 255, 0.1);
             color: #696cff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin: 0 auto 20px;
+            font-size: 28px;
+            margin-bottom: 24px;
             transition: all 0.3s ease;
         }
 
-        .step-card:hover .step-circle {
-            background-color: #696cff;
+        .card-premium:hover .icon-box {
+            background: #696cff;
             color: #ffffff;
-            transform: scale(1.1);
-            box-shadow: 0 10px 20px rgba(105, 108, 255, 0.3);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .bg-corporate-dark {
+            background-color: #1a233a;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .bg-corporate-dark::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.5;
+        }
+
+        .step-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #696cff, #00d2ff);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 15px rgba(105, 108, 255, 0.3);
+        }
+
+        .step-line {
+            position: absolute;
+            top: 25px;
+            left: 50px;
+            width: calc(100% - 30px);
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+
+        @media (max-width: 991px) {
+            .step-line {
+                display: none;
+            }
+        }
+
+        /* Timeline CSS */
+        .timeline-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .custom-timeline {
+            border-left: 2px solid #e7e7ff;
+            padding-left: 30px;
+            margin-left: 15px;
+            position: relative;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-indicator {
+            position: absolute;
+            left: -39px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #696cff;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.2);
+        }
+
+        .timeline-date {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(105, 108, 255, 0.1);
+            color: #696cff;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .timeline-content {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            box-shadow: 0 8px 25px rgba(105, 108, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .timeline-list {
+            padding-left: 1rem;
+            margin-bottom: 0;
+        }
+
+        .timeline-list li {
+            margin-bottom: 8px;
+            color: #6c757d;
+        }
+
+        .timeline-list li strong {
+            color: #3a3b45;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         #btnBackToTop {
@@ -171,76 +334,22 @@
             bottom: 30px;
             right: 30px;
             display: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
             z-index: 999;
-            box-shadow: 0 4px 10px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(105, 108, 255, 0.4);
             transition: all 0.3s ease;
-            align-items: center !important;
-            justify-content: center !important;
+            align-items: center;
+            justify-content: center;
             background-color: #696cff;
             border: none;
             cursor: pointer;
         }
 
-        #btnBackToTop i {
-            font-size: 24px;
-            color: white;
-            margin: 0;
-            padding: 0;
-            line-height: 1;
-        }
-
         #btnBackToTop:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(105, 108, 255, 0.6);
-        }
-
-        .alur-section {
-            padding: 100px 0;
-            position: relative;
-        }
-
-        .step-card {
-            position: relative;
-        }
-
-        @media (min-width: 992px) {
-            .step-card:not(:last-child)::after {
-                content: '';
-                position: absolute;
-                top: 35px;
-                right: -50%;
-                width: 100%;
-                height: 3px;
-                background-color: #e7e7ff;
-                z-index: 0;
-            }
-        }
-
-        .step-circle {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background-color: #e7e7ff;
-            color: #696cff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin: 0 auto 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step-card:hover .step-circle {
-            background-color: #696cff;
-            color: #ffffff;
-            transform: scale(1.1);
-            box-shadow: 0 10px 20px rgba(105, 108, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(105, 108, 255, 0.6);
         }
     </style>
 </head>
@@ -292,203 +401,332 @@
                         </g>
                     </g>
                 </svg>
-
-                <span>SyncBudget<span class="text-dark"></span></span>
+                <span>SyncBudget</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+                <i class="bx bx-menu fs-3"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto fw-medium text-dark">
                     <li class="nav-item px-2"><a class="nav-link text-dark" href="#beranda">Beranda</a></li>
-                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#tentang">Tentang Sistem</a></li>
-                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#layanan">Fitur MVP</a></li>
-                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#alur">Alur Prosedur</a></li>
+                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#arsitektur">Arsitektur</a></li>
+                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#fitur">Modul Sistem</a></li>
+                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#alur">Alur Operasional</a></li>
+                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#pembaruan">Jejak Sistem</a></li>
                 </ul>
-                <a href="/login" class="btn btn-primary rounded-pill px-4 shadow-sm btn-glow">
-                    Masuk <i class="bx bx-log-in-circle ms-1"></i>
-                </a>
+                @auth
+                    <a href="{{ url('/dashboard') }}"
+                        class="btn btn-primary rounded-pill px-4 shadow-sm btn-glow fw-medium">
+                        Ke Dasbor <i class="bx bx-home-alt ms-1"></i>
+                    </a>
+                @else
+                    <a href="{{ url('/login') }}" class="btn btn-primary rounded-pill px-4 shadow-sm btn-glow fw-medium">
+                        Masuk Panel <i class="bx bx-right-arrow-alt ms-1"></i>
+                    </a>
+                @endauth
             </div>
         </div>
     </nav>
 
-    <section id="beranda" class="hero-fullscreen">
-        <div class="hero-blob-1"></div>
-        <div class="hero-blob-2"></div>
-        <div class="container-xxl relative" style="z-index: 1;">
+    <section id="beranda" class="hero-section">
+        <div class="hero-glow"></div>
+        <div class="hero-glow-2"></div>
+        <div class="container-xxl">
             <div class="row align-items-center">
-                <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start">
-                    <span class="badge bg-label-primary rounded-pill px-3 py-2 mb-3">Sistem Informasi Bisnis</span>
-                    <h1 class="display-4 fw-bolder text-dark mb-4" style="line-height: 1.2;">
-                        Kendalikan Anggaran <br> <span class="text-gradient">Secara Akurat & Real-Time</span>
+                <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start reveal active">
+                    <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-label-primary mb-4">
+                        <span class="badge bg-primary rounded-pill">Baru</span>
+                        <span class="small fw-semibold">Enterprise E-Budgeting v2.0</span>
+                    </div>
+                    <h1 class="display-4 fw-bolder text-dark mb-4" style="line-height: 1.15; letter-spacing: -1px;">
+                        Kendalikan Anggaran <br> Dengan Presisi & <span class="text-gradient">Keamanan Finansial</span>
                     </h1>
-                    <p class="lead text-muted mb-5 pe-lg-5">
-                        Platform panel kendali manajemen keuangan terintegrasi. Dirancang untuk memastikan transparansi
-                        alur dana, mencegah kebocoran anggaran, dan mempercepat proses persetujuan manajerial.
+                    <p class="fs-5 text-muted mb-5 pe-lg-5" style="line-height: 1.6;">
+                        Arsitektur E-Budgeting modern yang meredefinisi transparansi operasional. Dilengkapi dengan
+                        kontrol persetujuan dinamis, proteksi kebocoran saldo secara real-time, dan integrasi API
+                        menyeluruh.
                     </p>
-                    <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
-                        <a href="#layanan" class="btn btn-primary btn-lg rounded-pill px-5 btn-glow shadow">Eksplorasi
-                            Sistem</a>
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                        <a href="#arsitektur" class="btn btn-primary btn-lg rounded-pill px-5 btn-glow">Pelajari
+                            Arsitektur</a>
+                        <a href="#fitur" class="btn btn-outline-secondary btn-lg rounded-pill px-4">Eksplorasi
+                            Fitur</a>
                     </div>
                 </div>
-                <div class="col-lg-6 text-center">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop"
-                        alt="Dashboard Finance" class="img-fluid rounded-3 shadow-lg img-floating"
-                        style="border: 8px solid white;">
-                </div>
-            </div>
-        </div>
-
-        <div class="custom-shape-divider-bottom">
-            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"
-                preserveAspectRatio="none">
-                <path d="M0,0 C300,100 900,100 1200,0 L1200,120 L0,120 Z" class="shape-fill"></path>
-            </svg>
-        </div>
-    </section>
-
-    <section id="tentang" class="content-section bg-white">
-        <div class="container-xxl">
-            <div class="row align-items-center flex-row-reverse">
-                <div class="col-lg-6 mb-4 mb-lg-0 text-center">
-                    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop"
-                        alt="Office Meeting" class="img-fluid rounded-3 shadow-sm">
-                </div>
-                <div class="col-lg-6 pe-lg-5 text-center text-lg-start">
-                    <h6 class="text-primary fw-bold text-uppercase mb-2">Latar Belakang</h6>
-                    <h2 class="fw-bold text-dark mb-4">Mendigitalisasi Proses Keuangan Tradisional</h2>
-                    <p class="text-muted mb-4" style="text-align: justify;">
-                        Sistem SyncBudget ini dikembangkan sebagai solusi atas lambatnya proses persetujuan anggaran
-                        berbasis kertas. Kami membawa seluruh alur birokrasi ke dalam satu portal digital yang aman dan
-                        dapat dilacak.
-                    </p>
-                    <p class="text-muted" style="text-align: justify;">
-                        Dengan basis data terpusat, manajemen tingkat atas kini memiliki visibilitas penuh terhadap
-                        kondisi finansial perusahaan, memungkinkan pengambilan keputusan strategis yang jauh lebih cepat
-                        dan tepat sasaran.
-                    </p>
+                <div class="col-lg-6 reveal active" style="transition-delay: 0.2s;">
+                    <div class="browser-mockup">
+                        <div class="browser-header">
+                            <div class="browser-dot dot-red"></div>
+                            <div class="browser-dot dot-yellow"></div>
+                            <div class="browser-dot dot-green"></div>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1642104704074-907c0698cbd9?q=80&w=1000&auto=format&fit=crop"
+                            class="w-100 d-block" style="object-fit: cover; height: 100%;"
+                            alt="Enterprise Data Tech">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="layanan" class="content-section" style="background-color: #fcfcfc;">
+    <section id="arsitektur" class="section-padding bg-white">
         <div class="container-xxl">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold text-dark">6 Fitur Inti Sistem SyncBudget</h2>
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold tracking-wide text-uppercase small">System Design & Integrity</span>
+                <h2 class="fw-bolder text-dark mt-2 mb-3">Arsitektur Skala Enterprise</h2>
+                <p class="text-muted mx-auto fs-6" style="max-width: 600px;">
+                    Dibangun di atas fondasi teknologi yang berfokus pada keandalan data historis, keamanan transaksi
+                    multi-user, dan konektivitas lintas platform.
+                </p>
             </div>
 
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card p-4">
-                        <div class="card-body">
-                            <i class='bx bx-sitemap text-primary mb-3' style="font-size: 3rem;"></i>
-                            <h5 class="fw-bold">Approval Berjenjang</h5>
-                            <p class="text-muted mb-0">Alur persetujuan dinamis (Staff &rarr; Supervisor &rarr;
-                                Manager)
-                                yang tersistematis dan anti-langkau.</p>
-                        </div>
+                <div class="col-lg-4 reveal" style="transition-delay: 0.1s;">
+                    <div class="card-premium p-4 p-xl-5">
+                        <div class="icon-box"><i class="bx bx-lock-alt"></i></div>
+                        <h4 class="fw-bold mb-3">Keamanan Transaksional</h4>
+                        <p class="text-muted mb-0" style="line-height: 1.6;">
+                            Menerapkan skema <strong>Row-Level Locking</strong> pada tingkat database PostgreSQL.
+                            Mencegah secara absolut terjadinya kebocoran saldo akibat eksekusi persetujuan ganda dalam
+                            hitungan milidetik.
+                        </p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card p-4">
-                        <div class="card-body">
-                            <i class='bx bx-line-chart text-primary mb-3' style="font-size: 3rem;"></i>
-                            <h5 class="fw-bold">Pemantauan Pagu</h5>
-                            <p class="text-muted mb-0">Kalkulasi otomatis sisa anggaran divisi. Sistem menolak
-                                pengajuan jika pagu dana tidak mencukupi.</p>
-                        </div>
+                <div class="col-lg-4 reveal" style="transition-delay: 0.2s;">
+                    <div class="card-premium p-4 p-xl-5">
+                        <div class="icon-box"><i class="bx bx-history"></i></div>
+                        <h4 class="fw-bold mb-3">Integritas Data Historis</h4>
+                        <p class="text-muted mb-0" style="line-height: 1.6;">
+                            Arsitektur diamankan dengan <strong>Global Soft Deletes</strong>. Penghapusan data master
+                            tidak akan memicu Cascade Delete, menjamin seluruh rekam jejak audit keuangan abadi untuk
+                            keperluan LPJ.
+                        </p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card p-4">
-                        <div class="card-body">
-                            <i class='bx bxs-file-pdf text-primary mb-3' style="font-size: 3rem;"></i>
-                            <h5 class="fw-bold">Ekspor Dokumen PDF</h5>
-                            <p class="text-muted mb-0">Hasilkan laporan pertanggungjawaban dan rekapitulasi pengeluaran
-                                bulanan dalam format PDF dengan satu klik.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card p-4">
-                        <div class="card-body">
-                            <i class='bx bx-user-circle text-primary mb-3' style="font-size: 3rem;"></i>
-                            <h5 class="fw-bold">Manajemen Peran (RBAC)</h5>
-                            <p class="text-muted mb-0">Pembatasan hak akses yang ketat. Setiap tingkat jabatan memiliki
-                                tampilan dasbor dan otoritas yang berbeda.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card p-4">
-                        <div class="card-body">
-                            <i class='bx bx-bell text-primary mb-3' style="font-size: 3rem;"></i>
-                            <h5 class="fw-bold">Notifikasi Status</h5>
-                            <p class="text-muted mb-0">Pemberitahuan real-time saat pengajuan dana ditolak, direvisi,
-                                atau berhasil dicairkan oleh bagian keuangan.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 feature-card p-4">
-                        <div class="card-body">
-                            <i class='bx bx-history text-primary mb-3' style="font-size: 3rem;"></i>
-                            <h5 class="fw-bold">Jejak Audit Aktivitas</h5>
-                            <p class="text-muted mb-0">Setiap aksi (input, edit, hapus, validasi) dicatat beserta waktu
-                                dan identitas penggunanya untuk transparansi.</p>
-                        </div>
+                <div class="col-lg-4 reveal" style="transition-delay: 0.3s;">
+                    <div class="card-premium p-4 p-xl-5">
+                        <div class="icon-box"><i class="bx bx-code-alt"></i></div>
+                        <h4 class="fw-bold mb-3">RESTful API Terenkripsi</h4>
+                        <p class="text-muted mb-0" style="line-height: 1.6;">
+                            Dilengkapi dengan endpoint API mutakhir yang diotentikasi melalui <strong>Laravel
+                                Sanctum</strong>. Memungkinkan interaksi sistem secara real-time langsung dari perangkat
+                            mobile para staf operasional.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="alur" class="alur-section bg-white">
-        <div class="container-xxl text-center">
-            <h6 class="text-primary fw-bold text-uppercase mb-2">Standard Operating Procedure</h6>
-            <h2 class="fw-bold text-dark mb-5">Siklus Anggaran Dalam Sistem</h2>
-
-            <div class="row g-4 justify-content-center">
-                <div class="col-sm-6 col-lg-3 step-card">
-                    <div class="step-circle shadow-sm">1</div>
-                    <h5 class="fw-bold mb-3">Input Pengajuan</h5>
-                    <p class="text-muted small px-3">Pengguna divisi mengunggah rincian kebutuhan dana beserta dokumen pendukung (RAB).</p>
-                </div>
-                <div class="col-sm-6 col-lg-3 step-card">
-                    <div class="step-circle shadow-sm">2</div>
-                    <h5 class="fw-bold mb-3">Proses Validasi</h5>
-                    <p class="text-muted small px-3">Sistem meneruskan pengajuan ke manajer terkait untuk meninjau kesesuaian nominal.</p>
-                </div>
-                <div class="col-sm-6 col-lg-3 step-card">
-                    <div class="step-circle shadow-sm">3</div>
-                    <h5 class="fw-bold mb-3">Pencairan Dana</h5>
-                    <p class="text-muted small px-3">Status disetujui, bagian keuangan mencairkan dana. Sistem memotong saldo pagu instan.</p>
-                </div>
-                <div class="col-sm-6 col-lg-3 step-card">
-                    <div class="step-circle shadow-sm">4</div>
-                    <h5 class="fw-bold mb-3">Laporan (LPJ)</h5>
-                    <p class="text-muted small px-3">Realisasi dana diunggah kembali beserta nota sebagai syarat penutupan siklus.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="pt-5 pb-4" style="background-color: #232333; color: #a1b0cb;">
+    <section id="fitur" class="section-padding" style="background-color: #f8f9fa;">
         <div class="container-xxl">
-            <div class="row align-items-center mt-2">
-                <div class="col-md-6 text-center text-md-start small">
-                    © 2026 SyncBudget. Hak Cipta Dilindungi.
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold tracking-wide text-uppercase small">Modul Operasional</span>
+                <h2 class="fw-bolder text-dark mt-2 mb-3">Fitur Unggulan SyncBudget</h2>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4 reveal">
+                    <div class="card-premium p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class='bx bx-git-merge text-primary fs-2 me-3'></i>
+                            <h5 class="fw-bold mb-0">Manajemen Multi-Divisi</h5>
+                        </div>
+                        <p class="text-muted mb-0">Implementasi relasi dinamis yang mengizinkan satu akun Manajer untuk
+                            mengawasi dan menyetujui anggaran lintas departemen secara bersamaan.</p>
+                    </div>
                 </div>
-                <div class="col-md-6 text-center text-md-end small mt-3 mt-md-0">
+                <div class="col-md-6 col-lg-4 reveal" style="transition-delay: 0.1s;">
+                    <div class="card-premium p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class='bx bx-pie-chart-alt-2 text-primary fs-2 me-3'></i>
+                            <h5 class="fw-bold mb-0">Dasbor Metrik Multi-Role</h5>
+                        </div>
+                        <p class="text-muted mb-0">Visualisasi data interaktif menggunakan ApexCharts, disesuaikan
+                            secara hierarkis berdasarkan tingkat otoritas pengguna (RBAC).</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 reveal" style="transition-delay: 0.2s;">
+                    <div class="card-premium p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class='bx bxs-file-pdf text-primary fs-2 me-3'></i>
+                            <h5 class="fw-bold mb-0">Otomatisasi Laporan (LPJ)</h5>
+                        </div>
+                        <p class="text-muted mb-0">Mesin render PDF dengan manajemen memori optimal (chunking) untuk
+                            mengekspor rekapitulasi pengeluaran masif tanpa membebani server.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 reveal">
+                    <div class="card-premium p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class='bx bx-calendar-check text-primary fs-2 me-3'></i>
+                            <h5 class="fw-bold mb-0">Fiscal Year Guard</h5>
+                        </div>
+                        <p class="text-muted mb-0">Sistem pintar yang mendeteksi dan mencegah tumpang tindih aktivasi
+                            Tahun Anggaran guna memastikan akurasi kalkulasi saldo global.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 reveal" style="transition-delay: 0.1s;">
+                    <div class="card-premium p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class='bx bx-trash text-primary fs-2 me-3'></i>
+                            <h5 class="fw-bold mb-0">Automated Storage Cleanup</h5>
+                        </div>
+                        <p class="text-muted mb-0">Logika pembersihan storage otomatis yang menghancurkan file struk
+                            fisik usang hanya saat pengajuan benar-benar dihapus permanen.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 reveal" style="transition-delay: 0.2s;">
+                    <div class="card-premium p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class='bx bx-shield-quarter text-primary fs-2 me-3'></i>
+                            <h5 class="fw-bold mb-0">Audit Aktivitas Pengguna</h5>
+                        </div>
+                        <p class="text-muted mb-0">Pencatatan rekam jejak sistematis untuk setiap aksi krusial sistem
+                            guna menunjang transparansi tata kelola korporat yang akuntabel.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="alur" class="section-padding bg-corporate-dark">
+        <div class="container-xxl text-center">
+            <span class="text-primary fw-bold tracking-wide text-uppercase small">Standard Operating Procedure</span>
+            <h2 class="fw-bolder text-white mt-2 mb-5">Siklus Anggaran Digital Terintegrasi</h2>
+
+            <div class="row g-0 justify-content-center pt-4">
+                <div class="col-md-6 col-lg-3 step-wrapper reveal">
+                    <div class="step-line"></div>
+                    <div class="d-flex flex-column align-items-center px-4">
+                        <div class="step-number">1</div>
+                        <h5 class="fw-bold text-white mb-2">Integrasi Mobile</h5>
+                        <p class="text-light small" style="opacity: 0.8;">Staf mengunggah rincian kebutuhan dana
+                            beserta foto struk secara real-time via aplikasi ponsel.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 step-wrapper reveal" style="transition-delay: 0.1s;">
+                    <div class="step-line"></div>
+                    <div class="d-flex flex-column align-items-center px-4">
+                        <div class="step-number">2</div>
+                        <h5 class="fw-bold text-white mb-2">Validasi Hierarkis</h5>
+                        <p class="text-light small" style="opacity: 0.8;">Manajer Multi-Divisi meninjau notifikasi dan
+                            memverifikasi kelayakan berdasarkan sisa pagu.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 step-wrapper reveal" style="transition-delay: 0.2s;">
+                    <div class="step-line"></div>
+                    <div class="d-flex flex-column align-items-center px-4">
+                        <div class="step-number">3</div>
+                        <h5 class="fw-bold text-white mb-2">Pencairan Sistematis</h5>
+                        <p class="text-light small" style="opacity: 0.8;">Sistem memotong saldo secara atomik saat
+                            disetujui, menjamin keseimbangan buku besar tanpa selisih.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 step-wrapper reveal" style="transition-delay: 0.3s;">
+                    <div class="d-flex flex-column align-items-center px-4">
+                        <div class="step-number">4</div>
+                        <h5 class="fw-bold text-white mb-2">Pelaporan Otomatis</h5>
+                        <p class="text-light small" style="opacity: 0.8;">Admin mengekspor Laporan Pertanggungjawaban
+                            (LPJ) PDF yang merangkum seluruh rekam jejak audit.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pembaruan" class="section-padding bg-white">
+        <div class="container-xxl">
+            <div class="text-center mb-5 reveal">
+                <span class="text-primary fw-bold tracking-wide text-uppercase small">Development Journey</span>
+                <h2 class="fw-bolder text-dark mt-2 mb-3">Log Pembaruan Sistem</h2>
+                <p class="text-muted mx-auto fs-6" style="max-width: 600px;">
+                    Riwayat pengembangan dan optimasi arsitektur sistem SyncBudget untuk mencapai standar fungsionalitas
+                    tingkat korporat.
+                </p>
+            </div>
+
+            <div class="timeline-container reveal">
+                <div class="custom-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-indicator"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">23 Maret 2026</span>
+                            <h5 class="fw-bold mb-3">Enterprise Architecture, Soft Deletes & UI Integration</h5>
+                            <ul class="timeline-list">
+                                <li><strong>Pre-emptive Budget Locking:</strong> Implementasi
+                                    <code>DB::transaction()</code> dan <code>lockForUpdate()</code> pada persetujuan
+                                    dana untuk mencegah kebocoran saldo akibat <i>race condition</i>.
+                                </li>
+                                <li><strong>Multi-Division Manager:</strong> Skema pengawasan Many-to-Many via tabel
+                                    pivot berbasis UUID.</li>
+                                <li><strong>Global Soft Deletes:</strong> Proteksi data historis dan laporan dari
+                                    kerusakan akibat <i>Cascade Delete</i>.</li>
+                                <li><strong>Automated LPJ PDF:</strong> Integrasi <code>laravel-dompdf</code> dengan
+                                    desain Modern Corporate dan <i>Memory Chunking</i>.</li>
+                                <li><strong>Database Normalization:</strong> Pemisahan master data Kategori dan Tahun
+                                    Anggaran secara komprehensif.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-indicator"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">21 Maret 2026</span>
+                            <h5 class="fw-bold mb-3">Master Budgeting & Core Reimbursement Engine</h5>
+                            <ul class="timeline-list">
+                                <li><strong>Core Reimbursement Engine:</strong> Pembuatan sistem Pengajuan Dana dengan
+                                    Role-Based Access Control mutlak.</li>
+                                <li><strong>Financial Automation:</strong> Penerapan logika bisnis untuk kalkulasi dan
+                                    pemotongan saldo pagu (<code>used_amount</code>) secara dinamis.</li>
+                                <li><strong>Global Localization:</strong> Konfigurasi zona waktu
+                                    <code>Asia/Jakarta</code> dan translasi validasi ke bahasa Indonesia baku.
+                                </li>
+                                <li><strong>Advanced Data Filtering:</strong> Fitur pencarian dan filter multi-kolom
+                                    untuk pemantauan audit log dan status pengajuan.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-indicator"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">20 Maret 2026</span>
+                            <h5 class="fw-bold mb-3">Initial Backend, Auth & Core Foundation</h5>
+                            <ul class="timeline-list">
+                                <li><strong>Security Layer:</strong> Setup Spatie Roles & Permissions (Admin, Manager,
+                                    Staff) dan <i>Role-based redirection</i>.</li>
+                                <li><strong>Secure Data Import:</strong> Fitur import pengguna massal dilengkapi
+                                    sanitasi anti-CSV Injection.</li>
+                                <li><strong>Audit Trail Foundation:</strong> Integrasi Spatie Activitylog untuk
+                                    perekaman diam-diam atas semua jejak perubahan data.</li>
+                                <li><strong>Database Setup:</strong> Migrasi infrastruktur PostgreSQL dengan struktur
+                                    relasional awal dan data <i>seeding</i> otomatis.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-4 bg-white border-top">
+        <div class="container-xxl">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start small text-muted">
+                    &copy; 2026 SyncBudget Enterprise. Hak Cipta Dilindungi.
+                </div>
+                <div class="col-md-6 text-center text-md-end small mt-2 mt-md-0 fw-semibold text-dark">
                     Sistem Informasi Bisnis - Politeknik Negeri Malang
                 </div>
             </div>
         </div>
     </footer>
 
-    <button id="btnBackToTop" class="btn btn-primary rounded-circle shadow" title="Kembali ke atas">
-        <i class="bx bx-up-arrow-alt text-white"></i>
+    <button id="btnBackToTop" title="Kembali ke atas">
+        <i class="bx bx-up-arrow-alt fs-3"></i>
     </button>
 
     <script src="{{ asset('sneat/assets/vendor/libs/jquery/jquery.js') }}"></script>
@@ -496,21 +734,49 @@
     <script src="{{ asset('sneat/assets/vendor/js/bootstrap.js') }}"></script>
 
     <script>
-        let mybutton = document.getElementById("btnBackToTop");
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbar = document.querySelector('.navbar-landing');
+            const mybutton = document.getElementById("btnBackToTop");
+            const reveals = document.querySelectorAll(".reveal");
 
-        window.onscroll = function() {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-                mybutton.style.display = "flex";
-            } else {
-                mybutton.style.display = "none";
+            function reveal() {
+                for (let i = 0; i < reveals.length; i++) {
+                    let windowHeight = window.innerHeight;
+                    let elementTop = reveals[i].getBoundingClientRect().top;
+                    let elementVisible = 50;
+
+                    if (elementTop < windowHeight - elementVisible) {
+                        reveals[i].classList.add("active");
+                    }
+                }
             }
-        };
 
-        mybutton.addEventListener("click", function() {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
+            window.addEventListener("scroll", function() {
+                reveal();
+
+                if (window.scrollY > 50) {
+                    navbar.style.padding = "10px 0";
+                    navbar.style.boxShadow = "0 4px 20px rgba(0,0,0,0.08)";
+                } else {
+                    navbar.style.padding = "16px 0";
+                    navbar.style.boxShadow = "none";
+                }
+
+                if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                    mybutton.style.display = "flex";
+                } else {
+                    mybutton.style.display = "none";
+                }
             });
+
+            mybutton.addEventListener("click", function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            });
+
+            reveal();
         });
     </script>
 </body>

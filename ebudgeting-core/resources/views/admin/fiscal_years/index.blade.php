@@ -3,6 +3,29 @@
 @section('content')
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Kelola Data /</span> Tahun Anggaran</h4>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Daftar Tahun Anggaran</h5>
@@ -76,16 +99,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Tahun</label>
+                        <label class="form-label">Tahun<span class="text-danger">*</span></label>
                         <input type="number" name="year" class="form-control" placeholder="2026" required>
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col">
-                            <label class="form-label">Tanggal Mulai</label>
+                            <label class="form-label">Tanggal Mulai<span class="text-danger">*</span></label>
                             <input type="date" name="start_date" class="form-control" required>
                         </div>
                         <div class="col">
-                            <label class="form-label">Tanggal Berakhir</label>
+                            <label class="form-label">Tanggal Berakhir<span class="text-danger">*</span></label>
                             <input type="date" name="end_date" class="form-control" required>
                         </div>
                     </div>
@@ -114,7 +137,8 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Tahun</label>
-                            <input type="number" name="year" class="form-control" value="{{ $item->year }}" required>
+                            <input type="number" name="year" class="form-control" value="{{ $item->year }}"
+                                required>
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col">

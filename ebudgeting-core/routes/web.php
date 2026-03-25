@@ -8,10 +8,26 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReimbursementController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (Auth::check()) {
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            return redirect('/admin/dashboard');
+        } elseif ($user->hasRole('manager')) {
+            return redirect('/manager/dashboard');
+        } else {
+            return redirect('/reimbursements');
+        }
+    }
+
     return view('index');
 });
 
@@ -74,4 +90,9 @@ Route::middleware(['auth'])->prefix('reimbursements')->name('reimbursements.')->
     Route::put('/{id}/reject', [ReimbursementController::class, 'reject'])->name('reject')->middleware('role:admin|manager');
 
     Route::get('/export-pdf', [ReimbursementController::class, 'exportPdf'])->name('export.pdf')->middleware('role:admin|manager');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });

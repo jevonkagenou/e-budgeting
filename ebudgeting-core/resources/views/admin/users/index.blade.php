@@ -3,6 +3,29 @@
 @section('content')
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sistem /</span> Manajemen Pengguna</h4>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
             <h5 class="mb-3 mb-md-0">Daftar Pengguna</h5>
@@ -113,19 +136,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Nama Lengkap</label>
+                        <label class="form-label">Nama Lengkap<span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Email<span class="text-danger">*</span></label>
                         <input type="email" name="email" class="form-control" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Password</label>
+                        <label class="form-label">Password<span class="text-danger">*</span></label>
                         <input type="password" name="password" class="form-control" required minlength="8" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Divisi Utama</label>
+                        <label class="form-label">Divisi Utama<span class="text-danger">*</span></label>
                         <select name="division_id" class="form-select" required>
                             <option value="">-- Pilih Divisi --</option>
                             @foreach ($divisions as $division)
@@ -134,8 +157,9 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Role</label>
-                        <select name="role" class="form-select role-select" data-target="managed-divisions-add" required>
+                        <label class="form-label">Role<span class="text-danger">*</span></label>
+                        <select name="role" class="form-select role-select" data-target="managed-divisions-add"
+                            required>
                             <option value="">-- Pilih Role --</option>
                             @foreach ($roles as $role)
                                 <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>

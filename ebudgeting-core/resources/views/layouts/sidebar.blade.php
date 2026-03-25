@@ -133,16 +133,5 @@
                 </a>
             </li>
         @endif
-
-        <li class="menu-header small text-uppercase"><span class="menu-header-text">Sistem</span></li>
-        <li class="menu-item">
-            <a href="#" class="menu-link text-danger" onclick="confirmLogout(event)">
-                <i class="menu-icon tf-icons bx bx-power-off"></i>
-                <div data-i18n="Logout">Keluar</div>
-            </a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
-            </form>
-        </li>
     </ul>
 </aside>

@@ -65,9 +65,9 @@ class ReimbursementController extends Controller
         $request->validate([
             'budget_id' => 'required|exists:budgets,id',
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'amount' => 'required|numeric|min:1000',
-            'receipt' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'receipt' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $receiptPath = null;
@@ -141,6 +141,14 @@ class ReimbursementController extends Controller
         return back()->with('success', 'Pengajuan dana berhasil ditolak.');
     }
 
+    public function destroy($id)
+    {
+        $reimbursement = Reimbursement::withTrashed()->findOrFail($id);
+        $reimbursement->forceDelete();
+
+        return back()->with('success', 'Pengajuan dana beserta struk lampirannya telah dihapus permanen.');
+    }
+
     public function exportPdf(Request $request)
     {
         $query = Reimbursement::with(['user.division', 'budget.fiscalYear', 'budget.budgetCategory', 'actionBy'])
@@ -154,7 +162,13 @@ class ReimbursementController extends Controller
             $query->whereDate('updated_at', '<=', $request->end_date);
         }
 
-        $reimbursements = $query->latest('updated_at')->get();
+        $reimbursements = collect();
+
+        $query->latest('updated_at')->chunk(500, function ($chunk) use ($reimbursements) {
+            foreach ($chunk as $item) {
+                $reimbursements->push($item);
+            }
+        });
 
         $pdf = Pdf::loadView('reimbursements.laporan_pdf', compact('reimbursements', 'request'))
             ->setPaper('a4', 'landscape');

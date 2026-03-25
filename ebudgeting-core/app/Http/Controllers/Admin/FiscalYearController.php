@@ -22,10 +22,6 @@ class FiscalYearController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        if ($request->has('is_active')) {
-            FiscalYear::query()->update(['is_active' => false]);
-        }
-
         FiscalYear::create([
             'year' => $request->year,
             'start_date' => $request->start_date,
@@ -45,10 +41,6 @@ class FiscalYearController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
-
-        if ($request->has('is_active')) {
-            FiscalYear::where('id', '!=', $id)->update(['is_active' => false]);
-        }
 
         $fiscalYear->update([
             'year' => $request->year,

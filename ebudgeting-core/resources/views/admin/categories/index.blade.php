@@ -3,6 +3,29 @@
 @section('content')
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Kelola Data /</span> Kategori Anggaran</h4>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Daftar Kategori</h5>
@@ -66,11 +89,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Kode Kategori</label>
+                        <label class="form-label">Kode Kategori<span class="text-danger">*</span></label>
                         <input type="text" name="code" class="form-control" placeholder="Contoh: IT-01" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Nama Kategori</label>
+                        <label class="form-label">Nama Kategori<span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" placeholder="Contoh: Infrastruktur & IT"
                             required>
                     </div>
@@ -95,11 +118,13 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Kode Kategori</label>
-                            <input type="text" name="code" class="form-control" value="{{ $item->code }}" required>
+                            <input type="text" name="code" class="form-control" value="{{ $item->code }}"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nama Kategori</label>
-                            <input type="text" name="name" class="form-control" value="{{ $item->name }}" required>
+                            <input type="text" name="name" class="form-control" value="{{ $item->name }}"
+                                required>
                         </div>
                     </div>
                     <div class="modal-footer">
