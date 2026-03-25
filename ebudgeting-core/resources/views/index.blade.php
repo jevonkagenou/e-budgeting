@@ -245,79 +245,6 @@
             }
         }
 
-        /* Timeline CSS */
-        .timeline-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .custom-timeline {
-            border-left: 2px solid #e7e7ff;
-            padding-left: 30px;
-            margin-left: 15px;
-            position: relative;
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .timeline-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .timeline-indicator {
-            position: absolute;
-            left: -39px;
-            top: 0;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #696cff;
-            border: 3px solid #fff;
-            box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.2);
-        }
-
-        .timeline-date {
-            display: inline-block;
-            padding: 4px 12px;
-            background: rgba(105, 108, 255, 0.1);
-            color: #696cff;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .timeline-content {
-            background: #fff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .timeline-content:hover {
-            box-shadow: 0 8px 25px rgba(105, 108, 255, 0.1);
-            transform: translateX(5px);
-        }
-
-        .timeline-list {
-            padding-left: 1rem;
-            margin-bottom: 0;
-        }
-
-        .timeline-list li {
-            margin-bottom: 8px;
-            color: #6c757d;
-        }
-
-        .timeline-list li strong {
-            color: #3a3b45;
-        }
-
         .reveal {
             opacity: 0;
             transform: translateY(40px);
@@ -343,6 +270,7 @@
             align-items: center;
             justify-content: center;
             background-color: #696cff;
+            color: #ffffff;
             border: none;
             cursor: pointer;
         }
@@ -413,7 +341,7 @@
                     <li class="nav-item px-2"><a class="nav-link text-dark" href="#arsitektur">Arsitektur</a></li>
                     <li class="nav-item px-2"><a class="nav-link text-dark" href="#fitur">Modul Sistem</a></li>
                     <li class="nav-item px-2"><a class="nav-link text-dark" href="#alur">Alur Operasional</a></li>
-                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#pembaruan">Jejak Sistem</a></li>
+                    <li class="nav-item px-2"><a class="nav-link text-dark" href="#pengguna">Ekosistem Peran</a></li>
                 </ul>
                 @auth
                     <a href="{{ url('/dashboard') }}"
@@ -636,79 +564,124 @@
         </div>
     </section>
 
-    <section id="pembaruan" class="section-padding bg-white">
+    <section id="pengguna" class="section-padding bg-white">
         <div class="container-xxl">
             <div class="text-center mb-5 reveal">
-                <span class="text-primary fw-bold tracking-wide text-uppercase small">Development Journey</span>
-                <h2 class="fw-bolder text-dark mt-2 mb-3">Log Pembaruan Sistem</h2>
-                <p class="text-muted mx-auto fs-6" style="max-width: 600px;">
-                    Riwayat pengembangan dan optimasi arsitektur sistem SyncBudget untuk mencapai standar fungsionalitas
-                    tingkat korporat.
+                <span class="text-primary fw-bold tracking-wide text-uppercase small">Role-Based Ecosystem</span>
+                <h2 class="fw-bolder text-dark mt-2 mb-3">Satu Platform, Tiga Pendekatan Spesifik</h2>
+                <p class="text-muted mx-auto fs-6" style="max-width: 700px;">
+                    SyncBudget secara cerdas membedakan antarmuka dan wewenang berdasarkan peran pengguna. Memberikan
+                    pengalaman yang presisi, aman, dan relevan untuk setiap hierarki manajemen korporasi.
                 </p>
             </div>
 
-            <div class="timeline-container reveal">
-                <div class="custom-timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-indicator"></div>
-                        <div class="timeline-content">
-                            <span class="timeline-date">23 Maret 2026</span>
-                            <h5 class="fw-bold mb-3">Enterprise Architecture, Soft Deletes & UI Integration</h5>
-                            <ul class="timeline-list">
-                                <li><strong>Pre-emptive Budget Locking:</strong> Implementasi
-                                    <code>DB::transaction()</code> dan <code>lockForUpdate()</code> pada persetujuan
-                                    dana untuk mencegah kebocoran saldo akibat <i>race condition</i>.
-                                </li>
-                                <li><strong>Multi-Division Manager:</strong> Skema pengawasan Many-to-Many via tabel
-                                    pivot berbasis UUID.</li>
-                                <li><strong>Global Soft Deletes:</strong> Proteksi data historis dan laporan dari
-                                    kerusakan akibat <i>Cascade Delete</i>.</li>
-                                <li><strong>Automated LPJ PDF:</strong> Integrasi <code>laravel-dompdf</code> dengan
-                                    desain Modern Corporate dan <i>Memory Chunking</i>.</li>
-                                <li><strong>Database Normalization:</strong> Pemisahan master data Kategori dan Tahun
-                                    Anggaran secara komprehensif.</li>
+            <div class="row g-4">
+                <div class="col-lg-4 reveal">
+                    <div class="card h-100 border-0 shadow-sm rounded-4"
+                        style="background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                        <div class="card-body p-4 p-xl-5">
+                            <div class="d-flex align-items-center justify-content-center bg-label-primary rounded-circle mb-4"
+                                style="width: 70px; height: 70px;">
+                                <i class="bx bx-user fs-2 text-primary"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Staf Operasional</h4>
+                            <p class="text-muted mb-4" style="font-size: 0.95rem;">Fokus pada efisiensi pengajuan dan
+                                transparansi status pencairan dana.</p>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex align-items-start mb-3"><i
+                                        class="bx bxs-check-circle text-primary mt-1 me-2"></i> <span>Pengajuan dana
+                                        responsif dengan otorisasi lampiran fisik (struk).</span></li>
+                                <li class="d-flex align-items-start mb-3"><i
+                                        class="bx bxs-check-circle text-primary mt-1 me-2"></i> <span>Pelacakan riwayat
+                                        persetujuan secara <i>real-time</i> tanpa jeda.</span></li>
+                                <li class="d-flex align-items-start"><i
+                                        class="bx bxs-check-circle text-primary mt-1 me-2"></i> <span>Pemantauan sisa
+                                        pagu anggaran divisi yang transparan.</span></li>
                             </ul>
                         </div>
                     </div>
+                </div>
 
-                    <div class="timeline-item">
-                        <div class="timeline-indicator"></div>
-                        <div class="timeline-content">
-                            <span class="timeline-date">21 Maret 2026</span>
-                            <h5 class="fw-bold mb-3">Master Budgeting & Core Reimbursement Engine</h5>
-                            <ul class="timeline-list">
-                                <li><strong>Core Reimbursement Engine:</strong> Pembuatan sistem Pengajuan Dana dengan
-                                    Role-Based Access Control mutlak.</li>
-                                <li><strong>Financial Automation:</strong> Penerapan logika bisnis untuk kalkulasi dan
-                                    pemotongan saldo pagu (<code>used_amount</code>) secara dinamis.</li>
-                                <li><strong>Global Localization:</strong> Konfigurasi zona waktu
-                                    <code>Asia/Jakarta</code> dan translasi validasi ke bahasa Indonesia baku.
-                                </li>
-                                <li><strong>Advanced Data Filtering:</strong> Fitur pencarian dan filter multi-kolom
-                                    untuk pemantauan audit log dan status pengajuan.</li>
+                <div class="col-lg-4 reveal" style="transition-delay: 0.1s;">
+                    <div class="card h-100 border-0 shadow-sm rounded-4"
+                        style="background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                        <div class="card-body p-4 p-xl-5">
+                            <div class="d-flex align-items-center justify-content-center bg-label-success rounded-circle mb-4"
+                                style="width: 70px; height: 70px;">
+                                <i class="bx bx-briefcase fs-2 text-success"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Manajer Divisi</h4>
+                            <p class="text-muted mb-4" style="font-size: 0.95rem;">Fokus pada kontrol arus kas,
+                                validasi kelayakan, dan pengawasan departemen.</p>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex align-items-start mb-3"><i
+                                        class="bx bxs-check-circle text-success mt-1 me-2"></i> <span>Otorisasi
+                                        pencairan aman dengan perlindungan anti <i>race-condition</i>.</span></li>
+                                <li class="d-flex align-items-start mb-3"><i
+                                        class="bx bxs-check-circle text-success mt-1 me-2"></i> <span>Visibilitas
+                                        metrik serapan anggaran multi-divisi secara terpusat.</span></li>
+                                <li class="d-flex align-items-start"><i
+                                        class="bx bxs-check-circle text-success mt-1 me-2"></i> <span>Mekanisme tolak
+                                        pengajuan yang mewajibkan input catatan evaluasi.</span></li>
                             </ul>
                         </div>
                     </div>
+                </div>
 
-                    <div class="timeline-item">
-                        <div class="timeline-indicator"></div>
-                        <div class="timeline-content">
-                            <span class="timeline-date">20 Maret 2026</span>
-                            <h5 class="fw-bold mb-3">Initial Backend, Auth & Core Foundation</h5>
-                            <ul class="timeline-list">
-                                <li><strong>Security Layer:</strong> Setup Spatie Roles & Permissions (Admin, Manager,
-                                    Staff) dan <i>Role-based redirection</i>.</li>
-                                <li><strong>Secure Data Import:</strong> Fitur import pengguna massal dilengkapi
-                                    sanitasi anti-CSV Injection.</li>
-                                <li><strong>Audit Trail Foundation:</strong> Integrasi Spatie Activitylog untuk
-                                    perekaman diam-diam atas semua jejak perubahan data.</li>
-                                <li><strong>Database Setup:</strong> Migrasi infrastruktur PostgreSQL dengan struktur
-                                    relasional awal dan data <i>seeding</i> otomatis.</li>
+                <div class="col-lg-4 reveal" style="transition-delay: 0.2s;">
+                    <div class="card h-100 border-0 shadow-sm rounded-4"
+                        style="background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                        <div class="card-body p-4 p-xl-5">
+                            <div class="d-flex align-items-center justify-content-center bg-label-danger rounded-circle mb-4"
+                                style="width: 70px; height: 70px;">
+                                <i class="bx bx-shield-quarter fs-2 text-danger"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Administrator</h4>
+                            <p class="text-muted mb-4" style="font-size: 0.95rem;">Fokus pada tata kelola master data,
+                                audit investigatif, dan pelaporan korporat.</p>
+                            <ul class="list-unstyled mb-0">
+                                <li class="d-flex align-items-start mb-3"><i
+                                        class="bx bxs-check-circle text-danger mt-1 me-2"></i> <span>Akses tak terbatas
+                                        untuk mengelola konfigurasi <i>Core System</i>.</span></li>
+                                <li class="d-flex align-items-start mb-3"><i
+                                        class="bx bxs-check-circle text-danger mt-1 me-2"></i> <span>Mengekstraksi
+                                        Laporan Pertanggungjawaban (LPJ) PDF secara masif.</span></li>
+                                <li class="d-flex align-items-start"><i
+                                        class="bx bxs-check-circle text-danger mt-1 me-2"></i> <span>Pemantauan absolut
+                                        atas <i>Activity Log</i> dari seluruh lalu lintas pengguna.</span></li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="section-padding bg-primary text-white text-center position-relative overflow-hidden">
+        <div class="container-xxl position-relative z-2 reveal">
+            <h2 class="fw-bolder text-white mb-3">Siap Mengoptimalkan Anggaran Organisasi Anda?</h2>
+            <p class="fs-6 mb-5 opacity-75 mx-auto" style="max-width: 600px;">
+                Tingkatkan transparansi, cegah kebocoran dana, dan percepat alur birokrasi persetujuan finansial dengan
+                SyncBudget.
+            </p>
+            @auth
+                <a href="{{ url('/dashboard') }}"
+                    class="btn btn-light text-primary rounded-pill px-5 py-3 fw-bold shadow-sm"
+                    style="font-size: 1.1rem;">
+                    Buka Dasbor Sistem <i class="bx bx-right-arrow-alt ms-1"></i>
+                </a>
+            @else
+                <a href="{{ url('/login') }}" class="btn btn-light text-primary rounded-pill px-5 py-3 fw-bold shadow-sm"
+                    style="font-size: 1.1rem;">
+                    Mulai Sesi Login <i class="bx bx-right-arrow-alt ms-1"></i>
+                </a>
+            @endauth
+        </div>
+        <div class="hero-glow-2 position-absolute"
+            style="top: -50%; left: -10%; background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%); z-index: 1;">
+        </div>
+        <div class="hero-glow position-absolute"
+            style="bottom: -50%; right: -10%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%); z-index: 1;">
         </div>
     </section>
 
