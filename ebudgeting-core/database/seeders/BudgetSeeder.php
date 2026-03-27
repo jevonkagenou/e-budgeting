@@ -6,6 +6,7 @@ use App\Models\Budget;
 use App\Models\Division;
 use App\Models\FiscalYear;
 use App\Models\BudgetCategory;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
@@ -17,6 +18,13 @@ class BudgetSeeder extends Seeder
         $divKeuangan = Division::where('name', 'Keuangan')->first();
         $divOperasional = Division::where('name', 'Operasional')->first();
         $divHRD = Division::where('name', 'HRD')->first();
+
+        $adminUser = User::first();
+
+        if (!$adminUser) {
+            $this->command->error('User tidak ditemukan! Pastikan UserSeeder dijalankan lebih dulu.');
+            return;
+        }
 
         $fiscalYear = FiscalYear::firstOrCreate(
             ['year' => '2026'],
@@ -41,6 +49,9 @@ class BudgetSeeder extends Seeder
                     'name' => 'Anggaran IT & Infrastruktur Q1 2026',
                     'total_amount' => 50000000,
                     'used_amount' => 12500000,
+                    'start_date' => '2026-01-01',
+                    'end_date' => '2026-03-31',
+                    'created_by' => $adminUser->id,
                 ],
                 [
                     'fiscal_year_id' => $fiscalYear->id,
@@ -49,6 +60,9 @@ class BudgetSeeder extends Seeder
                     'name' => 'Dana Taktis Keuangan 2026',
                     'total_amount' => 100000000,
                     'used_amount' => 85000000,
+                    'start_date' => '2026-01-01',
+                    'end_date' => '2026-12-31',
+                    'created_by' => $adminUser->id,
                 ],
                 [
                     'fiscal_year_id' => $fiscalYear->id,
@@ -57,6 +71,9 @@ class BudgetSeeder extends Seeder
                     'name' => 'Anggaran Operasional Cabang',
                     'total_amount' => 200000000,
                     'used_amount' => 120000000,
+                    'start_date' => '2026-01-01',
+                    'end_date' => '2026-12-31',
+                    'created_by' => $adminUser->id,
                 ],
                 [
                     'fiscal_year_id' => $fiscalYear->id,
@@ -65,6 +82,9 @@ class BudgetSeeder extends Seeder
                     'name' => 'Anggaran Rekrutmen & Pelatihan',
                     'total_amount' => 75000000,
                     'used_amount' => 15000000,
+                    'start_date' => '2026-01-01',
+                    'end_date' => '2026-06-30',
+                    'created_by' => $adminUser->id,
                 ],
             ];
 

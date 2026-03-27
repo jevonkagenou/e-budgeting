@@ -20,6 +20,8 @@ class Budget extends Model
         'name',
         'total_amount',
         'used_amount',
+        'start_date',
+        'end_date',
         'created_by',
     ];
 

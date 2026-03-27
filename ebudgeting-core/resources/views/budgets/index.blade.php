@@ -3,6 +3,23 @@
 @section('content')
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Kelola Data /</span> Manajemen Anggaran</h4>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
             <h5 class="mb-3 mb-md-0">Daftar Pagu Anggaran Divisi</h5>
@@ -41,27 +58,31 @@
                 <tbody class="table-border-bottom-0">
                     @forelse($budgets as $budget)
                         @php
-                            $percentage =
-                                $budget->total_amount > 0 ? ($budget->used_amount / $budget->total_amount) * 100 : 0;
+                            // Perlindungan matematika dari nilai null
+                            $totalAmount = (float) ($budget->total_amount ?? 0);
+                            $usedAmount = (float) ($budget->used_amount ?? 0);
+
+                            $percentage = $totalAmount > 0 ? ($usedAmount / $totalAmount) * 100 : 0;
                             $progressColor =
                                 $percentage < 50 ? 'bg-success' : ($percentage < 80 ? 'bg-warning' : 'bg-danger');
                         @endphp
                         <tr>
                             <td>
                                 <strong>{{ $budget->name }}</strong><br>
-                                <small class="text-muted">Oleh: {{ $budget->creator->name ?? 'Sistem' }}</small>
+                                <small class="text-muted">Oleh: {{ $budget->creator?->name ?? 'Sistem' }}</small>
                             </td>
                             <td>
-                                <span class="badge bg-label-primary">{{ $budget->budgetCategory->name ?? '-' }}</span><br>
-                                <small class="text-muted mt-1 d-block">TA: {{ $budget->fiscalYear->year ?? '-' }}</small>
+                                <span class="badge bg-label-primary">{{ $budget->budgetCategory?->name ?? '-' }}</span><br>
+                                <small class="text-muted mt-1 d-block">TA: {{ $budget->fiscalYear?->year ?? '-' }}</small>
                             </td>
-                            <td><span class="badge bg-label-info">{{ $budget->division->name ?? 'Tanpa Divisi' }}</span>
+                            <td><span class="badge bg-label-info">{{ $budget->division?->name ?? 'Tanpa Divisi' }}</span>
                             </td>
                             <td>
-                                {{ \Carbon\Carbon::parse($budget->start_date)->format('d M Y') }} - <br>
-                                {{ \Carbon\Carbon::parse($budget->end_date)->format('d M Y') }}
+                                {{ $budget->start_date ? \Carbon\Carbon::parse($budget->start_date)->format('d M Y') : '-' }}
+                                - <br>
+                                {{ $budget->end_date ? \Carbon\Carbon::parse($budget->end_date)->format('d M Y') : '-' }}
                             </td>
-                            <td>{{ number_format($budget->total_amount, 0, ',', '.') }}</td>
+                            <td>{{ number_format($totalAmount, 0, ',', '.') }}</td>
                             <td>
                                 <div class="d-flex justify-content-between align-items-center gap-3">
                                     <div class="progress w-100" style="height: 8px;">
@@ -72,7 +93,7 @@
                                     <small class="fw-semibold">{{ number_format($percentage, 1) }}%</small>
                                 </div>
                                 <small class="text-muted mt-1 d-block">Terpakai: Rp
-                                    {{ number_format($budget->used_amount, 0, ',', '.') }}</small>
+                                    {{ number_format($usedAmount, 0, ',', '.') }}</small>
                             </td>
                             <td>
                                 <div class="dropdown">
@@ -179,7 +200,7 @@
                                     value="{{ intval($budget->total_amount) }}" min="{{ intval($budget->used_amount) }}"
                                     required />
                                 <small class="text-danger">*Minimal angka:
-                                    {{ number_format($budget->used_amount, 0, ',', '.') }} (Sesuai dana yang sudah
+                                    {{ number_format((float) $budget->used_amount, 0, ',', '.') }} (Sesuai dana yang sudah
                                     terpakai)</small>
                             </div>
                         </div>
@@ -187,12 +208,13 @@
                             <div class="col mb-0">
                                 <label class="form-label">Tanggal Mulai</label>
                                 <input type="date" name="start_date" class="form-control"
-                                    value="{{ $budget->start_date }}" required />
+                                    value="{{ $budget->start_date ? \Carbon\Carbon::parse($budget->start_date)->format('Y-m-d') : '' }}">
                             </div>
                             <div class="col mb-0">
                                 <label class="form-label">Tanggal Berakhir</label>
                                 <input type="date" name="end_date" class="form-control"
-                                    value="{{ $budget->end_date }}" required />
+                                    value="{{ $budget->end_date ? \Carbon\Carbon::parse($budget->end_date)->format('Y-m-d') : '' }}"
+                                    required />
                             </div>
                         </div>
                     </div>

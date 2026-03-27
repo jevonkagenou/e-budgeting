@@ -51,6 +51,14 @@ class BudgetController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
+        $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);
+
+        if ($request->start_date < $fiscalYear->start_date || $request->end_date > $fiscalYear->end_date) {
+            return back()->withErrors([
+                'start_date' => 'Tanggal mulai dan berakhir harus berada dalam rentang tahun fiskal (' . $fiscalYear->start_date . ' s/d ' . $fiscalYear->end_date . ').'
+            ])->withInput();
+        }
+
         Budget::create([
             'fiscal_year_id' => $request->fiscal_year_id,
             'budget_category_id' => $request->budget_category_id,
@@ -79,6 +87,14 @@ class BudgetController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
+
+        $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);
+
+        if ($request->start_date < $fiscalYear->start_date || $request->end_date > $fiscalYear->end_date) {
+            return back()->withErrors([
+                'start_date' => 'Tanggal mulai dan berakhir harus berada dalam rentang tahun fiskal (' . $fiscalYear->start_date . ' s/d ' . $fiscalYear->end_date . ').'
+            ])->withInput();
+        }
 
         $budget->update([
             'fiscal_year_id' => $request->fiscal_year_id,

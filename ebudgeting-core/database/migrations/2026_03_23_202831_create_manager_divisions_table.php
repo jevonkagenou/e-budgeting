@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('manager_divisions', function (Blueprint $table) {
             $table->primary(['user_id', 'division_id']);
-            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignUuid('division_id')->constrained('divisions')->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('users')->restrictOnDelete();
+            $table->foreignUuid('division_id')->constrained('divisions')->restrictOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
