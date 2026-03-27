@@ -76,7 +76,7 @@ class UserController extends Controller
 
         try {
             Excel::import(new UsersImport, $request->file('file'));
-            return back()->with('success', 'Data pengguna berhasil diimpor!');
+            return back()->with('success', 'Data pengguna berhasil diimpor! Password default untuk pengguna baru adalah: 12345678');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal impor! ' . $e->getMessage());
         }

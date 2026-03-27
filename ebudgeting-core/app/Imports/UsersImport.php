@@ -13,28 +13,41 @@ class UsersImport implements ToModel, WithHeadingRow
 {
     public function model(array $row)
     {
-        $divisionName = $this->sanitize(trim($row['divisi']));
-
-        $division = Division::firstOrCreate([
-            'name' => $divisionName
-        ]);
-
-        $user = User::updateOrCreate(
-            ['email' => $this->sanitize(trim($row['email']))],
-            [
-                'name'        => $this->sanitize(trim($row['nama'])),
-                'password'    => Hash::make($row['password']),
-                'division_id' => $division->id,
-            ]
-        );
-
-        $roleName = isset($row['role']) ? $this->sanitize(trim($row['role'])) : 'staff';
-
-        if (Role::where('name', $roleName)->exists()) {
-            $user->syncRoles([$roleName]);
-        } else {
-            $user->syncRoles(['staff']);
+        $email = $this->sanitize(trim($row['email'] ?? ''));
+        if (empty($email)) {
+            return null;
         }
+
+        $divisionName = $this->sanitize(trim($row['divisi'] ?? ''));
+        $division = Division::where('name', 'ilike', $divisionName)->first();
+
+        if (!$division && !empty($divisionName)) {
+            throw new \Exception("Gagal: Divisi '{$divisionName}' tidak ditemukan di sistem. Pastikan penulisan sesuai.");
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'email'       => $email,
+                'name'        => $this->sanitize(trim($row['nama'] ?? 'User Baru')),
+                'password'    => Hash::make('12345678'),
+                'division_id' => $division ? $division->id : null,
+            ]);
+        } else {
+            $user->update([
+                'name'        => $this->sanitize(trim($row['nama'] ?? $user->name)),
+                'division_id' => $division ? $division->id : $user->division_id,
+            ]);
+        }
+
+        $roleName = strtolower($this->sanitize(trim($row['role'] ?? 'staff')));
+
+        if ($roleName === 'admin' || !Role::where('name', $roleName)->exists()) {
+            $roleName = 'staff';
+        }
+
+        $user->syncRoles([$roleName]);
 
         return $user;
     }

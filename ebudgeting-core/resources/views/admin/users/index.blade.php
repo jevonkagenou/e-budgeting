@@ -38,6 +38,9 @@
                 </form>
 
                 <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+                        <i class="bx bx-import me-1"></i> Import CSV
+                    </button>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
                         <i class="bx bx-plus me-1"></i> Tambah Pengguna
                     </button>
@@ -124,6 +127,42 @@
                 {{ $users->appends(['search' => request('search')])->links() }}
             </div>
         @endif
+    </div>
+
+    <div class="modal fade" id="importModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form action="{{ route('admin.users.import') }}" method="POST" enctype="multipart/form-data"
+                class="modal-content">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Import Data Pengguna</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info d-flex align-items-start mb-3" role="alert">
+                        <span class="alert-icon text-info me-2 mt-1">
+                            <i class="bx bx-info-circle"></i>
+                        </span>
+                        <small>
+                            Sistem mengabaikan kolom password di CSV demi keamanan. Pengguna baru akan otomatis diberikan
+                            password default: <br>
+                            <code class="fs-6 text-dark fw-bold mt-1 d-block">12345678</code>
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pilih File CSV/Excel<span class="text-danger">*</span></label>
+                        <input type="file" name="file" class="form-control" accept=".csv, .xlsx, .xls" required />
+                        <div class="form-text mt-2">
+                            Belum punya template? <a href="{{ route('admin.users.template') }}">Download Template CSV</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">Import Data</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">

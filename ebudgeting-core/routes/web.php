@@ -13,6 +13,14 @@ use App\Http\Controllers\ReimbursementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+// Route::get('/reset-db-4458', function() {
+//     \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+//         '--seed' => true,
+//         '--force' => true
+//     ]);
+//     return 'Mantap! Database berhasil di-reset bersih dan di-seed ulang!';
+// });
+
 Route::get('/', function () {
     if (Auth::check()) {
 
@@ -76,10 +84,10 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->group(function () {
 
 // Rute Admin|Manager untuk manajemen anggaran
 Route::middleware(['auth', 'role:admin|manager'])->prefix('budgets')->group(function () {
-    Route::get('/budgets', [BudgetController::class, 'index'])->name('budgets.index');
-    Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
-    Route::put('/budgets/{id}', [BudgetController::class, 'update'])->name('budgets.update');
-    Route::delete('/budgets/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
+    Route::get('/', [BudgetController::class, 'index'])->name('budgets.index');
+    Route::post('/', [BudgetController::class, 'store'])->name('budgets.store');
+    Route::put('/{id}', [BudgetController::class, 'update'])->name('budgets.update');
+    Route::delete('/{id}', [BudgetController::class, 'destroy'])->name('budgets.destroy');
 });
 
 // Rute untuk pengajuan reimbursement (Admin & Staff bisa buat, Admin & Manager bisa approve/reject)

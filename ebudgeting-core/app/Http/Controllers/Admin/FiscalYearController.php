@@ -22,6 +22,15 @@ class FiscalYearController extends Controller
             'end_date' => 'required|date|after:start_date',
         ]);
 
+        $startYear = date('Y', strtotime($request->start_date));
+        $endYear = date('Y', strtotime($request->end_date));
+
+        if ($startYear != $request->year && $endYear != $request->year) {
+            return back()
+                ->withErrors(['start_date' => 'Tanggal mulai atau berakhir harus berada di dalam tahun anggaran ' . $request->year])
+                ->withInput();
+        }
+
         FiscalYear::create([
             'year' => $request->year,
             'start_date' => $request->start_date,
@@ -41,6 +50,15 @@ class FiscalYearController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
         ]);
+
+        $startYear = date('Y', strtotime($request->start_date));
+        $endYear = date('Y', strtotime($request->end_date));
+
+        if ($startYear != $request->year && $endYear != $request->year) {
+            return back()
+                ->withErrors(['start_date' => 'Tanggal mulai atau berakhir harus berada di dalam tahun anggaran ' . $request->year])
+                ->withInput();
+        }
 
         $fiscalYear->update([
             'year' => $request->year,
