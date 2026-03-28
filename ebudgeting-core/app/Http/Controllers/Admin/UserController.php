@@ -24,9 +24,9 @@ class UserController extends Controller
         })->with('managedDivisions');
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'ilike', "%{$search}%")
-                ->orWhere('email', 'ilike', "%{$search}%");
+                    ->orWhere('email', 'ilike', "%{$search}%");
             });
         }
 
@@ -42,7 +42,10 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
-                'required', 'string', 'email', 'max:255',
+                'required',
+                'string',
+                'email',
+                'max:255',
                 Rule::unique('users')->whereNull('deleted_at')
             ],
             'password' => 'required|string|min:8',
@@ -100,7 +103,10 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
-                'required', 'string', 'email', 'max:255',
+                'required',
+                'string',
+                'email',
+                'max:255',
                 Rule::unique('users')->ignore($user->id)->whereNull('deleted_at')
             ],
             'password' => 'nullable|string|min:8',

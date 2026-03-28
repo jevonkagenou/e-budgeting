@@ -7,6 +7,7 @@ use App\Models\Division;
 use App\Models\FiscalYear;
 use App\Models\BudgetCategory;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class BudgetController extends Controller
@@ -42,13 +43,23 @@ class BudgetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'fiscal_year_id' => 'required|exists:fiscal_years,id',
+            'fiscal_year_id' => [
+                'required',
+                'exists:fiscal_years,id',
+                Rule::unique('budgets')->where(function ($query) use ($request) {
+                    return $query->where('budget_category_id', $request->budget_category_id)
+                        ->where('division_id', $request->division_id)
+                        ->whereNull('deleted_at');
+                })
+            ],
             'budget_category_id' => 'required|exists:budget_categories,id',
             'division_id' => 'required|exists:divisions,id',
             'name' => 'required|string|max:255',
             'total_amount' => 'required|numeric|min:0',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+        ], [
+            'fiscal_year_id.unique' => 'Gagal: Pagu anggaran untuk Divisi dan Kategori ini sudah pernah dibuat pada Tahun Anggaran tersebut! Silakan edit data yang sudah ada.'
         ]);
 
         $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);

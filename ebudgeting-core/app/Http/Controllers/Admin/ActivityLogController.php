@@ -27,10 +27,10 @@ class ActivityLogController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhere('subject_type', 'like', "%{$search}%")
-                  ->orWhereHas('causer', function ($qCauser) use ($search) {
-                      $qCauser->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('subject_type', 'like', "%{$search}%")
+                    ->orWhereHas('causer', function ($qCauser) use ($search) {
+                        $qCauser->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 

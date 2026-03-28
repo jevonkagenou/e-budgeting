@@ -19,17 +19,17 @@ class DashboardController extends Controller
             ->whereYear('updated_at', now()->year)
             ->sum('amount');
 
-        $totalBudgetRemaining = Budget::whereHas('fiscalYear', function($q) {
-                $q->where('is_active', true);
-            })->sum(DB::raw('total_amount - used_amount'));
+        $totalBudgetRemaining = Budget::whereHas('fiscalYear', function ($q) {
+            $q->where('is_active', true);
+        })->sum(DB::raw('total_amount - used_amount'));
 
         $recentReimbursements = Reimbursement::with('user.division')->latest()->take(5)->get();
         $recentLogs = Activity::with('causer')->latest()->take(5)->get();
 
         $monthlyData = Reimbursement::select(
-                DB::raw('EXTRACT(MONTH FROM updated_at) as month'),
-                DB::raw('SUM(amount) as total')
-            )
+            DB::raw('EXTRACT(MONTH FROM updated_at) as month'),
+            DB::raw('SUM(amount) as total')
+        )
             ->where('status', 'approved')
             ->whereYear('updated_at', date('Y'))
             ->groupBy(DB::raw('EXTRACT(MONTH FROM updated_at)'))
@@ -44,8 +44,12 @@ class DashboardController extends Controller
         $chartDataJson = json_encode($chartData);
 
         return view('admin.dashboard', compact(
-            'pendingCount', 'approvedThisMonth', 'totalBudgetRemaining',
-            'recentReimbursements', 'recentLogs', 'chartDataJson'
+            'pendingCount',
+            'approvedThisMonth',
+            'totalBudgetRemaining',
+            'recentReimbursements',
+            'recentLogs',
+            'chartDataJson'
         ));
     }
 
@@ -55,24 +59,24 @@ class DashboardController extends Controller
 
         $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
 
-        $pendingCount = Reimbursement::whereHas('user', function($q) use ($managedDivisionIds) {
-                $q->whereIn('division_id', $managedDivisionIds);
-            })->where('status', 'pending')->count();
+        $pendingCount = Reimbursement::whereHas('user', function ($q) use ($managedDivisionIds) {
+            $q->whereIn('division_id', $managedDivisionIds);
+        })->where('status', 'pending')->count();
 
-        $approvedThisMonth = Reimbursement::whereHas('user', function($q) use ($managedDivisionIds) {
-                $q->whereIn('division_id', $managedDivisionIds);
-            })->where('status', 'approved')
+        $approvedThisMonth = Reimbursement::whereHas('user', function ($q) use ($managedDivisionIds) {
+            $q->whereIn('division_id', $managedDivisionIds);
+        })->where('status', 'approved')
             ->whereMonth('updated_at', now()->month)
             ->whereYear('updated_at', now()->year)
             ->sum('amount');
 
         $totalBudgetRemaining = Budget::whereIn('division_id', $managedDivisionIds)
-            ->whereHas('fiscalYear', function($q) {
+            ->whereHas('fiscalYear', function ($q) {
                 $q->where('is_active', true);
             })->sum(DB::raw('total_amount - used_amount'));
 
         $recentReimbursements = Reimbursement::with('user.division')
-            ->whereHas('user', function($q) use ($managedDivisionIds) {
+            ->whereHas('user', function ($q) use ($managedDivisionIds) {
                 $q->whereIn('division_id', $managedDivisionIds);
             })->latest()->take(5)->get();
 
@@ -87,7 +91,7 @@ class DashboardController extends Controller
         $myApprovedTotal = Reimbursement::where('user_id', $user->id)->where('status', 'approved')->sum('amount');
 
         $myBudgets = Budget::where('division_id', $user->division_id)
-            ->whereHas('fiscalYear', function($q) {
+            ->whereHas('fiscalYear', function ($q) {
                 $q->where('is_active', true);
             })->get();
 

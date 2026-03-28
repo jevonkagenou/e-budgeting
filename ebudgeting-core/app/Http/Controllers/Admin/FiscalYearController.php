@@ -31,6 +31,12 @@ class FiscalYearController extends Controller
                 ->withInput();
         }
 
+        if ($request->has('is_active') && strtotime($request->end_date) < strtotime(date('Y-m-d'))) {
+            return back()
+                ->withErrors(['is_active' => 'Tidak dapat mengaktifkan Tahun Anggaran yang masa berlakunya (Tanggal Berakhir) sudah terlewati.'])
+                ->withInput();
+        }
+
         FiscalYear::create([
             'year' => $request->year,
             'start_date' => $request->start_date,
@@ -57,6 +63,12 @@ class FiscalYearController extends Controller
         if ($startYear != $request->year && $endYear != $request->year) {
             return back()
                 ->withErrors(['start_date' => 'Tanggal mulai atau berakhir harus berada di dalam tahun anggaran ' . $request->year])
+                ->withInput();
+        }
+
+        if ($request->has('is_active') && strtotime($request->end_date) < strtotime(date('Y-m-d'))) {
+            return back()
+                ->withErrors(['is_active' => 'Tidak dapat mengaktifkan Tahun Anggaran yang masa berlakunya (Tanggal Berakhir) sudah terlewati.'])
                 ->withInput();
         }
 

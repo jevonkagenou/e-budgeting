@@ -153,10 +153,20 @@
                             </div>
                         </div>
                         <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" name="is_active"
-                                id="isActiveEdit{{ $item->id }}" {{ $item->is_active ? 'checked' : '' }}>
+                            @php
+                                $isExpired = \Carbon\Carbon::parse($item->end_date)->startOfDay()->isPast();
+                            @endphp
+                            <input class="form-check-input toggle-active-fy" type="checkbox" name="is_active"
+                                id="isActiveEdit{{ $item->id }}" {{ $item->is_active ? 'checked' : '' }}
+                                {{ $isExpired && !$item->is_active ? 'disabled' : '' }}>
                             <label class="form-check-label" for="isActiveEdit{{ $item->id }}">Set sebagai Tahun
                                 Aktif</label>
+                            @if ($isExpired && !$item->is_active)
+                                <small class="text-danger d-block mt-1" id="warningEdit{{ $item->id }}">
+                                    <i class="bx bx-error-circle"></i> Ubah Tanggal Berakhir ke masa depan untuk
+                                    mengaktifkan.
+                                </small>
+                            @endif
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -182,5 +192,32 @@
                 if (result.isConfirmed) document.getElementById('delete-form-' + id).submit();
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModals = document.querySelectorAll('[id^="editModal"]');
+
+            editModals.forEach(modal => {
+                const endDateInput = modal.querySelector('input[name="end_date"]');
+                const activeSwitch = modal.querySelector('.toggle-active-fy');
+                const warningText = modal.querySelector('[id^="warningEdit"]');
+
+                if (endDateInput && activeSwitch) {
+                    endDateInput.addEventListener('change', function() {
+                        const selectedDate = new Date(this.value);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        if (selectedDate >= today) {
+                            activeSwitch.removeAttribute('disabled');
+                            if (warningText) warningText.style.display = 'none';
+                        } else {
+                            activeSwitch.setAttribute('disabled', 'disabled');
+                            activeSwitch.checked = false;
+                            if (warningText) warningText.style.display = 'block';
+                        }
+                    });
+                }
+            });
+        });
     </script>
 @endsection

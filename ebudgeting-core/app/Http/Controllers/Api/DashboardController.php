@@ -21,14 +21,14 @@ class DashboardController extends Controller
         $budgetInfo = null;
         if ($division && $activeFiscalYear) {
             $budgetInfo = Budget::where('division_id', $division->id)
-                                ->where('fiscal_year_id', $activeFiscalYear->id)
-                                ->first();
+                ->where('fiscal_year_id', $activeFiscalYear->id)
+                ->first();
         }
 
         $recentReimbursements = Reimbursement::where('user_id', $user->id)
-                                            ->orderBy('created_at', 'desc')
-                                            ->take(5)
-                                            ->get();
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
 
         return response()->json([
             'success' => true,

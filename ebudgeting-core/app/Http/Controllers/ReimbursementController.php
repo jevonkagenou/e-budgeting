@@ -32,10 +32,10 @@ class ReimbursementController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'ilike', "%{$search}%")
-                  ->orWhere('description', 'ilike', "%{$search}%")
-                  ->orWhereHas('user', function ($u) use ($search) {
-                      $u->where('name', 'ilike', "%{$search}%");
-                  });
+                    ->orWhere('description', 'ilike', "%{$search}%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'ilike', "%{$search}%");
+                    });
             });
         }
 
@@ -46,9 +46,9 @@ class ReimbursementController extends Controller
         $reimbursements = $query->paginate(10);
 
         $budgetsQuery = Budget::whereHas('fiscalYear', function ($q) {
-                $q->whereDate('end_date', '>=', now())
-                  ->where('is_active', true);
-            })
+            $q->whereDate('end_date', '>=', now())
+                ->where('is_active', true);
+        })
             ->whereRaw('total_amount > used_amount');
 
         if (!$user->hasRole('admin')) {
@@ -69,6 +69,27 @@ class ReimbursementController extends Controller
             'amount' => 'required|numeric|min:1000',
             'receipt' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        $recentSubmission = Reimbursement::where('user_id', Auth::id())
+            ->where('budget_id', $request->budget_id)
+            ->where('amount', $request->amount)
+            ->where('created_at', '>=', now()->subMinute())
+            ->exists();
+
+        if ($recentSubmission) {
+            return back()->with('error', 'Sistem mendeteksi pengajuan ganda. Mohon tunggu 1 menit sebelum mengirim pengajuan yang sama.')->withInput();
+        }
+
+        $budget = Budget::with('fiscalYear')->findOrFail($request->budget_id);
+
+        if (!$budget->fiscalYear->is_active || now() > $budget->end_date || now() > $budget->fiscalYear->end_date) {
+            return back()->with('error', 'Pengajuan ditolak: Masa berlaku anggaran ini telah habis atau tahun buku sudah ditutup.')->withInput();
+        }
+
+        $remainingBalance = $budget->total_amount - $budget->used_amount;
+        if ($request->amount > $remainingBalance) {
+            return back()->with('error', 'Pengajuan ditolak: Sisa pagu anggaran (Rp ' . number_format($remainingBalance, 0, ',', '.') . ') tidak mencukupi untuk nominal ini.')->withInput();
+        }
 
         $receiptPath = null;
         if ($request->hasFile('receipt')) {
@@ -97,12 +118,16 @@ class ReimbursementController extends Controller
                 return back()->with('error', 'Status pengajuan sudah diproses sebelumnya!');
             }
 
-            $budget = Budget::where('id', $reimbursement->budget_id)
+            $budget = Budget::with('fiscalYear')
+                ->where('id', $reimbursement->budget_id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $remainingBalance = $budget->total_amount - $budget->used_amount;
+            if (!$budget->fiscalYear->is_active || now() > $budget->end_date || now() > $budget->fiscalYear->end_date) {
+                return back()->with('error', 'Gagal menyetujui: Masa berlaku anggaran ini telah habis atau tahun buku sudah ditutup.');
+            }
 
+            $remainingBalance = $budget->total_amount - $budget->used_amount;
             if ($remainingBalance < $reimbursement->amount) {
                 return back()->with('error', 'Gagal menyetujui! Sisa saldo anggaran tidak mencukupi untuk nominal ini.');
             }
@@ -143,10 +168,15 @@ class ReimbursementController extends Controller
 
     public function destroy($id)
     {
-        $reimbursement = Reimbursement::withTrashed()->findOrFail($id);
-        $reimbursement->forceDelete();
+        $reimbursement = Reimbursement::findOrFail($id);
 
-        return back()->with('success', 'Pengajuan dana beserta struk lampirannya telah dihapus permanen.');
+        if ($reimbursement->status !== 'pending') {
+            return back()->with('error', 'Akses ditolak: Data yang sudah diproses (Disetujui/Ditolak) tidak boleh dihapus demi integritas audit.');
+        }
+
+        $reimbursement->delete();
+
+        return back()->with('success', 'Pengajuan dana berhasil dibatalkan dan dihapus.');
     }
 
     public function exportPdf(Request $request)
@@ -173,6 +203,6 @@ class ReimbursementController extends Controller
         $pdf = Pdf::loadView('reimbursements.laporan_pdf', compact('reimbursements', 'request'))
             ->setPaper('a4', 'landscape');
 
-        return $pdf->download('LPJ_Reimbursement_' . date('Ymd_His') . '.pdf');
+        return $pdf->stream('LPJ_Reimbursement_' . date('Ymd_His') . '.pdf');
     }
 }

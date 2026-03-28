@@ -81,10 +81,11 @@
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }}</td>
                             <td>
-                                <strong>{{ $item->user->name }}</strong><br>
-                                <small class="text-muted">{{ $item->user->division->name ?? '-' }}</small>
+                                <strong>{{ $item->user?->name ?? 'User Terhapus' }}</strong><br>
+                                <small class="text-muted">{{ $item->user?->division?->name ?? '-' }}</small>
                             </td>
-                            <td><span class="badge bg-label-info">{{ $item->budget->name }}</span></td>
+                            <td><span class="badge bg-label-info">{{ $item->budget?->name ?? 'Anggaran Dihapus' }}</span>
+                            </td>
                             <td style="white-space: normal; min-width: 250px;">
                                 <strong>{{ $item->title }}</strong>
                                 <p class="text-muted mb-1" style="font-size: 0.85rem;">{{ $item->description }}</p>
@@ -110,10 +111,10 @@
                                     <span class="badge bg-warning">Menunggu</span>
                                 @elseif($item->status === 'approved')
                                     <span class="badge bg-success">Disetujui</span><br>
-                                    <small class="text-muted">Oleh: {{ $item->actionBy->name ?? 'Sistem' }}</small>
+                                    <small class="text-muted">Oleh: {{ $item->actionBy?->name ?? 'Sistem' }}</small>
                                 @else
                                     <span class="badge bg-danger">Ditolak</span><br>
-                                    <small class="text-muted">Oleh: {{ $item->actionBy->name ?? 'Sistem' }}</small>
+                                    <small class="text-muted">Oleh: {{ $item->actionBy?->name ?? 'Sistem' }}</small>
                                 @endif
                             </td>
                             @hasanyrole('manager|admin')
@@ -224,7 +225,7 @@
                                 <option value="">-- Pilih Dompet Anggaran --</option>
                                 @foreach ($budgets as $budget)
                                     <option value="{{ $budget->id }}">
-                                        {{ $budget->name }} (TA: {{ $budget->fiscalYear->year ?? '-' }} | Sisa: Rp
+                                        {{ $budget->name }} (TA: {{ $budget->fiscalYear?->year ?? '-' }} | Sisa: Rp
                                         {{ number_format($budget->total_amount - $budget->used_amount, 0, ',', '.') }})
                                     </option>
                                 @endforeach

@@ -3,22 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Budget;
 use App\Models\Reimbursement;
-use App\Models\FiscalYear;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class ReimbursementController extends Controller
 {
 
-public function index(Request $request)
+    public function index(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
 
         $reimbursements = \App\Models\Reimbursement::where('user_id', $user->id)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -56,60 +57,60 @@ public function index(Request $request)
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:150',
-            'date' => 'required|date',
+        $request->validate([
+            'budget_id' => 'required|exists:budgets,id',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
             'amount' => 'required|numeric|min:1000',
-            'description' => 'required|string|max:255',
-            'receipt_file' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'receipt' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($validator->fails()) {
+        $recentSubmission = Reimbursement::where('user_id', Auth::id())
+            ->where('budget_id', $request->budget_id)
+            ->where('amount', $request->amount)
+            ->where('created_at', '>=', now()->subMinute())
+            ->exists();
+
+        if ($recentSubmission) {
             return response()->json([
-                'success' => false,
-                'message' => 'Data pengajuan tidak valid',
-                'data' => $validator->errors()
-            ], 422);
+                'message' => 'Sistem mendeteksi pengajuan ganda. Mohon tunggu 1 menit sebelum mengirim pengajuan yang sama.'
+            ], 429);
         }
 
-        /** @var \App\Models\User $user */
-        $user = $request->user();
+        $budget = Budget::with('fiscalYear')->findOrFail($request->budget_id);
 
-        $activeFiscalYear = \App\Models\FiscalYear::where('is_active', true)->first();
-        if (!$activeFiscalYear) {
-            return response()->json(['success' => false, 'message' => 'Tidak ada Tahun Anggaran aktif.'], 400);
+        if (!$budget->fiscalYear->is_active || now() > $budget->end_date || now() > $budget->fiscalYear->end_date) {
+            return response()->json([
+                'message' => 'Pengajuan ditolak: Masa berlaku anggaran ini telah habis atau tahun buku sudah ditutup.'
+            ], 400);
         }
 
-        $budget = \App\Models\Budget::where('division_id', $user->division_id)
-                                    ->where('fiscal_year_id', $activeFiscalYear->id)
-                                    ->first();
-
-        if (!$budget) {
-            return response()->json(['success' => false, 'message' => 'Pagu anggaran divisi Anda belum diatur.'], 400);
+        $remainingBalance = $budget->total_amount - $budget->used_amount;
+        if ($request->amount > $remainingBalance) {
+            return response()->json([
+                'message' => 'Pengajuan ditolak: Sisa pagu anggaran tidak mencukupi.',
+                'remaining_balance' => $remainingBalance
+            ], 400);
         }
 
         $receiptPath = null;
-        if ($request->hasFile('receipt_file')) {
-            $receiptPath = $request->file('receipt_file')->store('receipts', 'public');
+        if ($request->hasFile('receipt')) {
+            $receiptPath = $request->file('receipt')->store('receipts', 'public');
         }
 
-        $reimbursement = \App\Models\Reimbursement::create([
-            'user_id' => $user->id,
-            'division_id' => $user->division_id,
-            'fiscal_year_id' => $activeFiscalYear->id,
-            'budget_id' => $budget->id,
+        $reimbursement = Reimbursement::create([
+            'user_id' => Auth::id(),
+            'budget_id' => $request->budget_id,
             'title' => $request->title,
-            'date' => $request->date,
-            'amount' => $request->amount,
             'description' => $request->description,
+            'amount' => $request->amount,
             'receipt_path' => $receiptPath,
             'status' => 'pending',
         ]);
 
         return response()->json([
-            'success' => true,
             'message' => 'Pengajuan dana berhasil dikirim',
-            'data' => $reimbursement
+            'data' => $reimbursement->load('budget')
         ], 201);
     }
 
@@ -146,8 +147,8 @@ public function index(Request $request)
 
             if ($request->status === 'approved') {
                 $budget = \App\Models\Budget::where('id', $reimbursement->budget_id)
-                                            ->lockForUpdate()
-                                            ->first();
+                    ->lockForUpdate()
+                    ->first();
 
                 $remainingBalance = $budget->total_amount - $budget->used_amount;
 
@@ -177,7 +178,6 @@ public function index(Request $request)
                 'message' => 'Status pengajuan berhasil diperbarui menjadi ' . strtoupper($request->status),
                 'data' => $reimbursement
             ], 200);
-
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
             return response()->json([
