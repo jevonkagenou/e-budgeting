@@ -87,7 +87,11 @@ class BudgetController extends Controller
 
     public function update(Request $request, $id)
     {
-        $budget = Budget::findOrFail($id);
+        $budget = Budget::with('fiscalYear')->findOrFail($id);
+
+        if (!$budget->fiscalYear->is_active) {
+            return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup. Data historis tidak boleh diubah.');
+        }
 
         $request->validate([
             'fiscal_year_id' => 'required|exists:fiscal_years,id',
@@ -122,7 +126,12 @@ class BudgetController extends Controller
 
     public function destroy($id)
     {
-        $budget = Budget::findOrFail($id);
+        $budget = Budget::with('fiscalYear')->findOrFail($id);
+
+        if (!$budget->fiscalYear->is_active) {
+            return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup. Data historis tidak boleh dihapus.');
+        }
+
         $budget->delete();
 
         return back()->with('success', 'Anggaran berhasil dihapus dari sistem!');

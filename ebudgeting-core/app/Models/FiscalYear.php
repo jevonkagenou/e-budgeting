@@ -42,4 +42,9 @@ class FiscalYear extends Model
     {
         return $this->hasMany(Budget::class);
     }
+
+    public function annualReport()
+    {
+        return $this->hasOne(AnnualReport::class);
+    }
 }

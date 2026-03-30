@@ -51,6 +51,10 @@ class FiscalYearController extends Controller
     {
         $fiscalYear = FiscalYear::findOrFail($id);
 
+        if (!$fiscalYear->is_active) {
+            return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup dan tidak dapat diubah.');
+        }
+
         $request->validate([
             'year' => 'required|digits:4|unique:fiscal_years,year,' . $id,
             'start_date' => 'required|date',
@@ -84,7 +88,14 @@ class FiscalYearController extends Controller
 
     public function destroy($id)
     {
-        FiscalYear::findOrFail($id)->delete();
+        $fiscalYear = FiscalYear::findOrFail($id);
+
+        if (!$fiscalYear->is_active) {
+            return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup dan tidak dapat dihapus.');
+        }
+
+        $fiscalYear->delete();
+
         return back()->with('success', 'Tahun Anggaran berhasil dihapus.');
     }
 }

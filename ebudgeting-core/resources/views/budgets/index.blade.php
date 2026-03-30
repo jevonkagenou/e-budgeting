@@ -42,23 +42,20 @@
             </div>
         </div>
 
-        <div class="table-responsive text-nowrap">
+        <div class="table-responsive">
             <table class="table table-hover" id="budgetsTable">
                 <thead>
                     <tr>
                         <th>Nama Anggaran</th>
-                        <th>Kategori & TA</th>
-                        <th>Divisi</th>
-                        <th>Periode</th>
+                        <th>Detail & Periode</th>
                         <th>Total Pagu (Rp)</th>
                         <th>Status Pemakaian</th>
-                        <th>Aksi</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @forelse($budgets as $budget)
                         @php
-                            // Perlindungan matematika dari nilai null
                             $totalAmount = (float) ($budget->total_amount ?? 0);
                             $usedAmount = (float) ($budget->used_amount ?? 0);
 
@@ -67,23 +64,33 @@
                                 $percentage < 50 ? 'bg-success' : ($percentage < 80 ? 'bg-warning' : 'bg-danger');
                         @endphp
                         <tr>
-                            <td>
+                            <td style="min-width: 200px;">
                                 <strong>{{ $budget->name }}</strong><br>
                                 <small class="text-muted">Oleh: {{ $budget->creator?->name ?? 'Sistem' }}</small>
                             </td>
-                            <td>
-                                <span class="badge bg-label-primary">{{ $budget->budgetCategory?->name ?? '-' }}</span><br>
-                                <small class="text-muted mt-1 d-block">TA: {{ $budget->fiscalYear?->year ?? '-' }}</small>
+                            <td style="min-width: 280px;">
+                                <div class="d-flex flex-column gap-1 mb-2">
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-2" style="width: 55px;">Divisi</small>
+                                        <span
+                                            class="badge bg-label-info">{{ $budget->division?->name ?? 'Tanpa Divisi' }}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-2" style="width: 55px;">Kategori</small>
+                                        <span class="badge bg-label-primary">{{ $budget->budgetCategory?->name ?? '-' }}
+                                            (TA: {{ $budget->fiscalYear?->year ?? '-' }})
+                                        </span>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-flex align-items-center">
+                                    <i class="bx bx-calendar me-1"></i>
+                                    {{ $budget->start_date ? \Carbon\Carbon::parse($budget->start_date)->format('d M Y') : '-' }}
+                                    s/d
+                                    {{ $budget->end_date ? \Carbon\Carbon::parse($budget->end_date)->format('d M Y') : '-' }}
+                                </small>
                             </td>
-                            <td><span class="badge bg-label-info">{{ $budget->division?->name ?? 'Tanpa Divisi' }}</span>
-                            </td>
-                            <td>
-                                {{ $budget->start_date ? \Carbon\Carbon::parse($budget->start_date)->format('d M Y') : '-' }}
-                                - <br>
-                                {{ $budget->end_date ? \Carbon\Carbon::parse($budget->end_date)->format('d M Y') : '-' }}
-                            </td>
-                            <td>{{ number_format($totalAmount, 0, ',', '.') }}</td>
-                            <td>
+                            <td><strong>{{ number_format($totalAmount, 0, ',', '.') }}</strong></td>
+                            <td style="min-width: 200px;">
                                 <div class="d-flex justify-content-between align-items-center gap-3">
                                     <div class="progress w-100" style="height: 8px;">
                                         <div class="progress-bar {{ $progressColor }}" role="progressbar"
@@ -96,33 +103,32 @@
                                     {{ number_format($usedAmount, 0, ',', '.') }}</small>
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
-                                        data-bs-toggle="dropdown">
-                                        <i class="bx bx-dots-vertical-rounded"></i>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal"
-                                            data-bs-target="#editModal{{ $budget->id }}">
-                                            <i class="bx bx-edit-alt me-1 text-warning"></i> Edit
-                                        </a>
-                                        <a class="dropdown-item" href="javascript:void(0);"
-                                            onclick="confirmDelete('{{ $budget->id }}')">
-                                            <i class="bx bx-trash me-1 text-danger"></i> Hapus
-                                        </a>
+                                @if ($budget->fiscalYear && $budget->fiscalYear->is_active)
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                            data-bs-toggle="modal" data-bs-target="#editModal{{ $budget->id }}"
+                                            title="Edit">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
+                                            onclick="confirmDelete('{{ $budget->id }}')" title="Hapus">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
                                     </div>
-                                </div>
 
-                                <form id="delete-form-{{ $budget->id }}"
-                                    action="{{ route('budgets.destroy', $budget->id) }}" method="POST" class="d-none">
-                                    @csrf
-                                    @method('DELETE')
-                                </form>
+                                    <form id="delete-form-{{ $budget->id }}"
+                                        action="{{ route('budgets.destroy', $budget->id) }}" method="POST" class="d-none">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                @else
+                                    <span class="badge bg-secondary"><i class="bx bx-lock-alt me-1"></i> Terkunci</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-4">Belum ada data pagu anggaran.</td>
+                            <td colspan="5" class="text-center py-4">Belum ada data pagu anggaran.</td>
                         </tr>
                     @endforelse
                 </tbody>

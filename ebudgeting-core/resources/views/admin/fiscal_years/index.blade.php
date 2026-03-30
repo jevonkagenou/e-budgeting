@@ -59,21 +59,26 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-warning" title="Edit"
-                                        data-bs-toggle="modal" data-bs-target="#editModal{{ $item->id }}">
-                                        <i class="bx bx-edit-alt"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus"
-                                        onclick="confirmDelete('{{ $item->id }}')">
-                                        <i class="bx bx-trash"></i>
-                                    </button>
-                                </div>
-                                <form id="delete-form-{{ $item->id }}"
-                                    action="{{ route('admin.fiscal_years.destroy', $item->id) }}" method="POST"
-                                    class="d-none">
-                                    @csrf @method('DELETE')
-                                </form>
+                                @if ($item->is_active)
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-warning"
+                                            title="Edit" data-bs-toggle="modal"
+                                            data-bs-target="#editModal{{ $item->id }}">
+                                            <i class="bx bx-edit-alt"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus"
+                                            onclick="confirmDelete('{{ $item->id }}')">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                    <form id="delete-form-{{ $item->id }}"
+                                        action="{{ route('admin.fiscal_years.destroy', $item->id) }}" method="POST"
+                                        class="d-none">
+                                        @csrf @method('DELETE')
+                                    </form>
+                                @else
+                                    <span class="badge bg-secondary"><i class="bx bx-lock-alt me-1"></i> Terkunci</span>
+                                @endif
                             </td>
                         </tr>
                     @empty

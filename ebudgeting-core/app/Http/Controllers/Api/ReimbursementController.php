@@ -7,17 +7,16 @@ use App\Models\Budget;
 use App\Models\Reimbursement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ReimbursementController extends Controller
 {
-
     public function index(Request $request)
     {
-        /** @var \App\Models\User $user */
         $user = $request->user();
 
-        $reimbursements = \App\Models\Reimbursement::where('user_id', $user->id)
+        $reimbursements = Reimbursement::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -30,7 +29,6 @@ class ReimbursementController extends Controller
 
     public function pendingList(Request $request)
     {
-        /** @var \App\Models\User $user */
         $user = $request->user();
 
         if (!$user->hasAnyRole(['manager', 'admin'])) {
@@ -40,7 +38,7 @@ class ReimbursementController extends Controller
             ], 403);
         }
 
-        $query = \App\Models\Reimbursement::with('user:id,name')->where('status', 'pending');
+        $query = Reimbursement::with('user:id,name')->where('status', 'pending');
 
         if ($user->hasRole('manager')) {
             $query->where('division_id', $user->division_id);
@@ -116,14 +114,13 @@ class ReimbursementController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        /** @var \App\Models\User $user */
         $user = $request->user();
 
         if (!$user->hasAnyRole(['manager', 'admin'])) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
         }
 
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'status' => 'required|in:approved,rejected',
             'rejection_reason' => 'required_if:status,rejected|string|max:255|nullable'
         ]);
@@ -132,7 +129,7 @@ class ReimbursementController extends Controller
             return response()->json(['success' => false, 'message' => 'Data tidak valid', 'data' => $validator->errors()], 422);
         }
 
-        $reimbursement = \App\Models\Reimbursement::find($id);
+        $reimbursement = Reimbursement::find($id);
 
         if (!$reimbursement) {
             return response()->json(['success' => false, 'message' => 'Data pengajuan tidak ditemukan'], 404);
@@ -143,17 +140,17 @@ class ReimbursementController extends Controller
         }
 
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
 
             if ($request->status === 'approved') {
-                $budget = \App\Models\Budget::where('id', $reimbursement->budget_id)
+                $budget = Budget::where('id', $reimbursement->budget_id)
                     ->lockForUpdate()
                     ->first();
 
                 $remainingBalance = $budget->total_amount - $budget->used_amount;
 
                 if ($remainingBalance < $reimbursement->amount) {
-                    \Illuminate\Support\Facades\DB::rollBack();
+                    DB::rollBack();
                     return response()->json([
                         'success' => false,
                         'message' => 'Gagal menyetujui! Sisa saldo anggaran tidak mencukupi untuk nominal ini.'
@@ -171,7 +168,7 @@ class ReimbursementController extends Controller
                 'rejection_reason' => $request->status === 'rejected' ? $request->rejection_reason : null,
             ]);
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -179,7 +176,7 @@ class ReimbursementController extends Controller
                 'data' => $reimbursement
             ], 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan pada sistem saat memproses pengajuan.'

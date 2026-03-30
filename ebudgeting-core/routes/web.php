@@ -13,13 +13,13 @@ use App\Http\Controllers\ReimbursementController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/reset-db-4458', function() {
-//     \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
-//         '--seed' => true,
-//         '--force' => true
-//     ]);
-//     return 'Mantap! Database berhasil di-reset bersih dan di-seed ulang!';
-// });
+Route::get('/restdb-77-4458-sarmat-ZWCWfO0y26c', function() {
+    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+        '--seed' => true,
+        '--force' => true
+    ]);
+    return 'Mantap! Database berhasil di-reset bersih dan di-seed ulang!';
+});
 
 Route::get('/', function () {
     if (Auth::check()) {
