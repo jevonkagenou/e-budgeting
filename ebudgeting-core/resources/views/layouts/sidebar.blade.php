@@ -126,6 +126,13 @@
         </li>
 
         @if (Auth::user()->hasRole('admin'))
+            <li class="menu-item {{ request()->routeIs('annual_reports.*') ? 'active' : '' }}">
+                <a href="{{ route('annual_reports.index') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-archive"></i>
+                    <div data-i18n="Arsip Laporan">Arsip Laporan</div>
+                </a>
+            </li>
+
             <li class="menu-item {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.logs.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-history"></i>

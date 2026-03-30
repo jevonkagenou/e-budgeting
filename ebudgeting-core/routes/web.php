@@ -10,16 +10,17 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReimbursementController;
+use App\Http\Controllers\Admin\AnnualReportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/restdb-77-4458-sarmat-ZWCWfO0y26c', function() {
-    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
-        '--seed' => true,
-        '--force' => true
-    ]);
-    return 'Mantap! Database berhasil di-reset bersih dan di-seed ulang!';
-});
+// Route::get('/restdb-77-4458-sarmat-ZWCWfO0y26c', function() {
+//     \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+//         '--seed' => true,
+//         '--force' => true
+//     ]);
+//     return 'Mantap! Database berhasil di-reset bersih dan di-seed ulang!';
+// });
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -68,6 +69,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/categories', [BudgetCategoryController::class, 'store'])->name('admin.categories.store');
     Route::put('/categories/{id}', [BudgetCategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{id}', [BudgetCategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
+    Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual_reports.index');
+    Route::get('/annual-reports/{id}/download', [AnnualReportController::class, 'download'])->name('annual_reports.download');
 
     Route::get('/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
 });
