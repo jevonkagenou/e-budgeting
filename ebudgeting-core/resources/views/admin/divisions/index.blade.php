@@ -27,22 +27,17 @@
     @endif
 
     <div class="card">
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-            <h5 class="mb-3 mb-md-0">Daftar Divisi</h5>
-            <div class="d-flex flex-column flex-md-row align-items-center gap-3">
-                <form action="{{ route('admin.divisions.index') }}" method="GET" class="input-group input-group-merge"
-                    style="width: 250px;">
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <h5 class="mb-0 text-nowrap">Daftar Divisi</h5>
+            <form action="{{ route('admin.divisions.index') }}" method="GET" class="d-grid gap-2 d-lg-flex">
+                <div class="input-group input-group-merge" style="min-width: 250px;">
                     <span class="input-group-text"><i class="bx bx-search"></i></span>
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                        placeholder="Cari divisi...">
-                </form>
-
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                        <i class="bx bx-plus me-1"></i> Tambah Divisi
-                    </button>
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari divisi...">
                 </div>
-            </div>
+                <button type="button" class="btn btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bx bx-plus me-1"></i> Tambah Divisi
+                </button>
+            </form>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -90,8 +85,8 @@
         </div>
 
         @if ($divisions->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">
-                {{ $divisions->appends(['search' => request('search')])->links() }}
+            <div class="card-footer pb-0">
+                {{ $divisions->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>
@@ -107,17 +102,16 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col mb-3">
-                                <label class="form-label">Nama Divisi</label>
-                                <input type="text" name="name" class="form-control" value="{{ $division->name }}"
-                                    required />
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Divisi <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" value="{{ $division->name }}" required />
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -133,17 +127,16 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Nama Divisi<span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control"
-                                placeholder="Contoh: HRD, Keuangan, IT" required />
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Divisi <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="Contoh: HRD, Keuangan, IT" required />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Data</button>
+                    <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>

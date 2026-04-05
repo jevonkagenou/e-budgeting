@@ -29,36 +29,30 @@
     @endif
 
     <div class="card">
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <h5 class="mb-0">Daftar Pengajuan Dana</h5>
-
-            <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+        <div class="card-header d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+            <h5 class="mb-0 text-nowrap">Daftar Pengajuan Dana</h5>
+            <form action="{{ route('reimbursements.index') }}" method="GET" class="d-grid gap-2 d-xl-flex">
+                <select name="status" class="form-select w-auto" style="min-width: 150px;" onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu</option>
+                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
+                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                </select>
+                <div class="input-group input-group-merge" style="min-width: 250px;">
+                    <span class="input-group-text"><i class="bx bx-search"></i></span>
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari pengajuan...">
+                </div>
                 @hasanyrole('manager|admin')
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exportPdfModal">
+                    <button type="button" class="btn btn-danger text-nowrap" data-bs-toggle="modal" data-bs-target="#exportPdfModal">
                         <i class="bx bxs-file-pdf me-1"></i> Export LPJ
                     </button>
                 @endhasanyrole
-                <form action="{{ route('reimbursements.index') }}" method="GET" class="d-flex gap-2">
-                    <select name="status" class="form-select" style="width: 160px;" onchange="this.form.submit()">
-                        <option value="">Semua Status</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu</option>
-                        <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
-                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
-                    </select>
-
-                    <div class="input-group input-group-merge" style="width: 250px;">
-                        <span class="input-group-text"><i class="bx bx-search"></i></span>
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Cari pengajuan...">
-                    </div>
-                </form>
-
                 @hasanyrole('staff|admin')
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <button type="button" class="btn btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#addModal">
                         <i class="bx bx-plus me-1"></i> Buat Pengajuan
                     </button>
                 @endhasanyrole
-            </div>
+            </form>
         </div>
 
         <div class="table-responsive">
@@ -71,9 +65,7 @@
                         <th>Keterangan</th>
                         <th>Nominal</th>
                         <th>Status</th>
-                        @hasanyrole('manager|admin')
-                            <th>Aksi</th>
-                        @endhasanyrole
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -117,28 +109,37 @@
                                     <small class="text-muted">Oleh: {{ $item->actionBy?->name ?? 'Sistem' }}</small>
                                 @endif
                             </td>
-                            @hasanyrole('manager|admin')
-                                <td>
-                                    @if ($item->status === 'pending')
-                                        <div class="d-flex align-items-center gap-2">
+                            <td>
+                                @if ($item->status === 'pending')
+                                    <div class="d-flex align-items-center gap-2">
+                                        @hasanyrole('manager|admin')
                                             <form id="approve-form-{{ $item->id }}"
                                                 action="{{ route('reimbursements.approve', $item->id) }}" method="POST">
                                                 @csrf @method('PUT')
                                                 <button type="button" class="btn btn-sm btn-icon btn-success"
-                                                    onclick="confirmApprove('{{ $item->id }}')">
+                                                    onclick="confirmApprove('{{ $item->id }}')" title="Setujui">
                                                     <i class="bx bx-check"></i>
                                                 </button>
                                             </form>
                                             <button type="button" class="btn btn-sm btn-icon btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#rejectModal{{ $item->id }}">
+                                                data-bs-target="#rejectModal{{ $item->id }}" title="Tolak">
                                                 <i class="bx bx-x"></i>
                                             </button>
-                                        </div>
-                                    @else
-                                        <span class="text-muted"><i class="bx bx-lock-alt"></i> Selesai</span>
-                                    @endif
-                                </td>
-                            @endhasanyrole
+                                        @endhasanyrole
+                                        
+                                        @if($item->user_id === Auth::id())
+                                            <form action="{{ route('reimbursements.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" title="Batalkan Pengajuan">
+                                                    <i class="bx bx-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                @else
+                                    <span class="text-muted"><i class="bx bx-lock-alt"></i> Selesai</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
@@ -150,8 +151,8 @@
         </div>
 
         @if ($reimbursements->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">
-                {{ $reimbursements->appends(['search' => request('search'), 'status' => request('status')])->links() }}
+            <div class="card-footer pb-0">
+                {{ $reimbursements->appends(['search' => request('search'), 'status' => request('status')])->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>
@@ -168,17 +169,18 @@
                                 aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p>Anda akan menolak pengajuan <strong>{{ $item->title }}</strong> senilai Rp
-                                {{ number_format($item->amount, 0, ',', '.') }}.</p>
-                            <div class="col mb-3">
+                            <p>Anda akan menolak pengajuan <strong>{{ $item->title }}</strong> senilai Rp {{ number_format($item->amount, 0, ',', '.') }}.</p>
+                            <div class="mb-3">
                                 <label class="form-label">Alasan Penolakan <span class="text-danger">*</span></label>
                                 <textarea name="rejection_reason" class="form-control" rows="3" required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-danger">Tolak Pengajuan</button>
+                            <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Tolak</button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -199,8 +201,10 @@
                             <p class="mb-0 text-wrap" style="word-break: break-word;">{{ $item->rejection_reason }}</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary"
-                                data-bs-dismiss="modal">Tutup</button>
+                            <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">Tutup</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -218,9 +222,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Ambil Dari Anggaran <span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <label class="form-label">Ambil Dari Anggaran <span class="text-danger">*</span></label>
                             <select name="budget_id" class="form-select" required>
                                 <option value="">-- Pilih Dompet Anggaran --</option>
                                 @foreach ($budgets as $budget)
@@ -230,37 +233,30 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Judul Pengajuan <span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <label class="form-label">Judul Pengajuan <span class="text-danger">*</span></label>
                             <input type="text" name="title" class="form-control" required />
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Nominal (Rp) <span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <label class="form-label">Nominal (Rp) <span class="text-danger">*</span></label>
                             <input type="number" name="amount" class="form-control" min="1000" required />
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Bukti Struk/Nota <span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <label class="form-label">Bukti Struk/Nota <span class="text-danger">*</span></label>
                             <input type="file" name="receipt" class="form-control"
                                 accept="image/jpeg, image/png, image/jpg" required />
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Keterangan Tambahan <span class="text-danger">*</span></label>
-                            <textarea name="description" class="form-control" rows="2" required></textarea>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Keterangan Tambahan <span class="text-danger">*</span></label>
+                        <textarea name="description" class="form-control" rows="2" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer mt-3">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+                    <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Kirim</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -277,21 +273,22 @@
                     <div class="alert alert-info mb-4">
                         Biarkan tanggal kosong jika ingin mencetak seluruh data historis yang telah disetujui.
                     </div>
-                    <div class="row g-2">
-                        <div class="col mb-0">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Mulai Tanggal (Disetujui)</label>
                             <input type="date" name="start_date" class="form-control" />
                         </div>
-                        <div class="col mb-0">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Sampai Tanggal (Disetujui)</label>
                             <input type="date" name="end_date" class="form-control" />
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger"><i class="bx bxs-file-pdf me-1"></i> Download
-                        PDF</button>
+                    <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger"><i class="bx bxs-file-pdf me-1"></i> Download</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -302,13 +299,8 @@
         const searchInput = document.querySelector('input[name="search"]');
 
         if (searchInput) {
-            searchInput.addEventListener('keyup', function() {
-                clearTimeout(typingTimer);
-                typingTimer = setTimeout(() => {
-                    this.form.submit();
-                }, 500);
-            });
-
+            // Evaluasi Enterprise UX: Form akan submit standar dari Enter / tombol perangkat.
+            // Fitur onkeyup diganti untuk meminimalisasi beban request query DB mendadak tiap 500ms
             if (searchInput.value) {
                 searchInput.focus();
                 let valLen = searchInput.value.length;

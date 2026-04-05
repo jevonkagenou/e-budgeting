@@ -19,9 +19,10 @@ class DashboardController extends Controller
             ->whereYear('updated_at', now()->year)
             ->sum('amount');
 
-        $totalBudgetRemaining = Budget::whereHas('fiscalYear', function ($q) {
-            $q->where('is_active', true);
-        })->sum(DB::raw('total_amount - used_amount'));
+        $totalBudgetRemaining = Budget::whereDate('end_date', '>=', now()->format('Y-m-d'))
+            ->whereHas('fiscalYear', function ($q) {
+                $q->where('is_active', true);
+            })->sum(DB::raw('total_amount - used_amount'));
 
         $recentReimbursements = Reimbursement::with('user.division')->latest()->take(5)->get();
         $recentLogs = Activity::with('causer')->latest()->take(5)->get();
@@ -71,6 +72,7 @@ class DashboardController extends Controller
             ->sum('amount');
 
         $totalBudgetRemaining = Budget::whereIn('division_id', $managedDivisionIds)
+            ->whereDate('end_date', '>=', now()->format('Y-m-d'))
             ->whereHas('fiscalYear', function ($q) {
                 $q->where('is_active', true);
             })->sum(DB::raw('total_amount - used_amount'));
@@ -91,6 +93,7 @@ class DashboardController extends Controller
         $myApprovedTotal = Reimbursement::where('user_id', $user->id)->where('status', 'approved')->sum('amount');
 
         $myBudgets = Budget::where('division_id', $user->division_id)
+            ->whereDate('end_date', '>=', now()->format('Y-m-d'))
             ->whereHas('fiscalYear', function ($q) {
                 $q->where('is_active', true);
             })->get();

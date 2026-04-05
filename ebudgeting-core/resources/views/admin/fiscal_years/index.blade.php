@@ -27,11 +27,13 @@
     @endif
 
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar Tahun Anggaran</h5>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="bx bx-plus me-1"></i> Tambah
-            </button>
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <h5 class="mb-0 text-nowrap">Daftar Tahun Anggaran</h5>
+            <div class="d-flex flex-column flex-sm-row gap-2 text-nowrap">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bx bx-plus me-1"></i> Tambah
+                </button>
+            </div>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -55,7 +57,10 @@
                                 @if ($item->is_active)
                                     <span class="badge bg-success">Aktif</span>
                                 @else
-                                    <span class="badge bg-secondary">Non-Aktif</span>
+                                    <span class="badge bg-secondary">Tutup Buku</span>
+                                @endif
+                                @if(\Carbon\Carbon::parse($item->end_date)->copy()->endOfDay()->isPast())
+                                    <span class="badge bg-danger ms-1">Kadaluarsa</span>
                                 @endif
                             </td>
                             <td>
@@ -90,7 +95,9 @@
             </table>
         </div>
         @if ($fiscalYears->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">{{ $fiscalYears->links() }}</div>
+            <div class="card-footer pb-0">
+                {{ $fiscalYears->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
+            </div>
         @endif
     </div>
 
@@ -107,13 +114,13 @@
                         <label class="form-label">Tahun<span class="text-danger">*</span></label>
                         <input type="number" name="year" class="form-control" placeholder="2026" required>
                     </div>
-                    <div class="row g-2 mb-3">
-                        <div class="col">
-                            <label class="form-label">Tanggal Mulai<span class="text-danger">*</span></label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Tanggal Mulai <span class="text-danger">*</span></label>
                             <input type="date" name="start_date" class="form-control" required>
                         </div>
-                        <div class="col">
-                            <label class="form-label">Tanggal Berakhir<span class="text-danger">*</span></label>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Tanggal Berakhir <span class="text-danger">*</span></label>
                             <input type="date" name="end_date" class="form-control" required>
                         </div>
                     </div>
@@ -123,8 +130,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -145,16 +154,14 @@
                             <input type="number" name="year" class="form-control" value="{{ $item->year }}"
                                 required>
                         </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col">
-                                <label class="form-label">Tanggal Mulai</label>
-                                <input type="date" name="start_date" class="form-control"
-                                    value="{{ $item->start_date }}" required>
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tanggal Mulai <span class="text-danger">*</span></label>
+                                <input type="date" name="start_date" class="form-control" value="{{ $item->start_date }}" required>
                             </div>
-                            <div class="col">
-                                <label class="form-label">Tanggal Berakhir</label>
-                                <input type="date" name="end_date" class="form-control"
-                                    value="{{ $item->end_date }}" required>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tanggal Berakhir <span class="text-danger">*</span></label>
+                                <input type="date" name="end_date" class="form-control" value="{{ $item->end_date }}" required>
                             </div>
                         </div>
                         <div class="form-check form-switch mb-2">
@@ -175,8 +182,10 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary" {{ $isExpired ? 'disabled' : '' }}>Simpan</button>
+                        </div>
                     </div>
                 </form>
             </div>

@@ -27,11 +27,13 @@
     @endif
 
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar Kategori</h5>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                <i class="bx bx-plus me-1"></i> Tambah
-            </button>
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <h5 class="mb-0 text-nowrap">Daftar Kategori</h5>
+            <div class="d-flex flex-column flex-sm-row gap-2 text-nowrap">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bx bx-plus me-1"></i> Tambah
+                </button>
+            </div>
         </div>
 
         <div class="table-responsive text-nowrap">
@@ -75,7 +77,9 @@
             </table>
         </div>
         @if ($categories->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">{{ $categories->links() }}</div>
+            <div class="card-footer pb-0">
+                {{ $categories->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
+            </div>
         @endif
     </div>
 

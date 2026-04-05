@@ -55,28 +55,6 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'Kredensial tidak ditemukan. Periksa kembali email dan kata sandi Anda.',
         ])->onlyInput('email');
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            /** @var \App\Models\User $user */
-            $user = Auth::user();
-
-            // (Redirect) sesuai Role Spatie
-            if ($user->hasRole('admin')) {
-                return redirect()->intended('/admin/dashboard');
-            } elseif ($user->hasRole('manager')) {
-                return redirect()->intended('/manager/dashboard');
-            } elseif ($user->hasRole('staff')) {
-                return redirect()->intended('/staff/dashboard');
-            }
-
-            return redirect()->intended('/');
-        }
-
-        return back()->withErrors([
-            'email' => 'Email atau kata sandi yang Anda masukkan salah.',
-        ])->onlyInput('email');
     }
 
     // logout

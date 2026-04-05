@@ -90,6 +90,10 @@ class FiscalYearController extends Controller
     {
         $fiscalYear = FiscalYear::findOrFail($id);
 
+        if ($fiscalYear->budgets()->exists()) {
+            return back()->with('error', 'Akses ditolak: Tahun Anggaran memiliki histori Pagu yang terikat. Tidak boleh dihapus demi integritas data!');
+        }
+
         if (!$fiscalYear->is_active) {
             return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup dan tidak dapat dihapus.');
         }

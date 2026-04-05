@@ -45,9 +45,10 @@ class ReimbursementController extends Controller
 
         $reimbursements = $query->paginate(10);
 
-        $budgetsQuery = Budget::whereHas('fiscalYear', function ($q) {
-            $q->whereDate('end_date', '>=', now())
-                ->where('is_active', true);
+        $budgetsQuery = Budget::whereDate('end_date', '>=', now()->format('Y-m-d'))
+            ->whereHas('fiscalYear', function ($q) {
+                $q->whereDate('end_date', '>=', now()->format('Y-m-d'))
+                  ->where('is_active', true);
         })
             ->whereRaw('total_amount > used_amount');
 
@@ -55,7 +56,7 @@ class ReimbursementController extends Controller
             $budgetsQuery->where('division_id', $user->division_id);
         }
 
-        $budgets = $budgetsQuery->get();
+        $budgets = $budgetsQuery->with('fiscalYear')->get();
 
         return view('reimbursements.index', compact('reimbursements', 'budgets', 'search', 'status'));
     }
@@ -82,11 +83,16 @@ class ReimbursementController extends Controller
 
         $budget = Budget::with('fiscalYear')->findOrFail($request->budget_id);
 
-        if (!$budget->fiscalYear->is_active || now() > $budget->end_date || now() > $budget->fiscalYear->end_date) {
+        if (!$budget->fiscalYear->is_active || now()->format('Y-m-d') > $budget->end_date || now()->format('Y-m-d') > $budget->fiscalYear->end_date) {
             return back()->with('error', 'Pengajuan ditolak: Masa berlaku anggaran ini telah habis atau tahun buku sudah ditutup.')->withInput();
         }
 
-        $remainingBalance = $budget->total_amount - $budget->used_amount;
+        // Mengamankan dari sisa saldo semu akibat banyak pengajuan pending
+        $pendingAmount = Reimbursement::where('budget_id', $budget->id)
+            ->where('status', 'pending')
+            ->sum('amount');
+            
+        $remainingBalance = $budget->total_amount - $budget->used_amount - $pendingAmount;
         if ($request->amount > $remainingBalance) {
             return back()->with('error', 'Pengajuan ditolak: Sisa pagu anggaran (Rp ' . number_format($remainingBalance, 0, ',', '.') . ') tidak mencukupi untuk nominal ini.')->withInput();
         }
@@ -112,7 +118,17 @@ class ReimbursementController extends Controller
     public function approve($id)
     {
         return DB::transaction(function () use ($id) {
-            $reimbursement = Reimbursement::findOrFail($id);
+            $reimbursement = Reimbursement::with('user')->findOrFail($id);
+
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+
+            if ($user->hasRole('manager')) {
+                $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+                if (!in_array($reimbursement->user->division_id, $managedDivisionIds)) {
+                    abort(403, 'Akses ditolak: Status pengajuan ini berada di luar kekuasaan Divisi Anda.');
+                }
+            }
 
             if ($reimbursement->status !== 'pending') {
                 return back()->with('error', 'Status pengajuan sudah diproses sebelumnya!');
@@ -123,7 +139,7 @@ class ReimbursementController extends Controller
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (!$budget->fiscalYear->is_active || now() > $budget->end_date || now() > $budget->fiscalYear->end_date) {
+            if (!$budget->fiscalYear->is_active || now()->format('Y-m-d') > $budget->end_date || now()->format('Y-m-d') > $budget->fiscalYear->end_date) {
                 return back()->with('error', 'Gagal menyetujui: Masa berlaku anggaran ini telah habis atau tahun buku sudah ditutup.');
             }
 
@@ -151,7 +167,17 @@ class ReimbursementController extends Controller
             'rejection_reason' => 'required|string|max:255'
         ]);
 
-        $reimbursement = Reimbursement::findOrFail($id);
+        $reimbursement = Reimbursement::with('user')->findOrFail($id);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->hasRole('manager')) {
+            $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+            if (!in_array($reimbursement->user->division_id, $managedDivisionIds)) {
+                abort(403, 'Akses ditolak: Status pengajuan ini berada di luar kekuasaan Divisi Anda.');
+            }
+        }
 
         if ($reimbursement->status !== 'pending') {
             return back()->with('error', 'Status pengajuan sudah diproses sebelumnya!');
@@ -170,6 +196,10 @@ class ReimbursementController extends Controller
     {
         $reimbursement = Reimbursement::findOrFail($id);
 
+        if ($reimbursement->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+            abort(403, 'Akses ditolak: Anda tidak memiliki hak untuk membatalkan pengajuan ini.');
+        }
+
         if ($reimbursement->status !== 'pending') {
             return back()->with('error', 'Akses ditolak: Data yang sudah diproses (Disetujui/Ditolak) tidak boleh dihapus demi integritas audit.');
         }
@@ -183,6 +213,16 @@ class ReimbursementController extends Controller
     {
         $query = Reimbursement::with(['user.division', 'budget.fiscalYear', 'budget.budgetCategory', 'actionBy'])
             ->where('status', 'approved');
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->hasRole('manager')) {
+            $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+            $query->whereHas('user', function ($q) use ($managedDivisionIds) {
+                $q->whereIn('division_id', $managedDivisionIds);
+            });
+        }
 
         if ($request->has('start_date') && $request->start_date != '') {
             $query->whereDate('updated_at', '>=', $request->start_date);

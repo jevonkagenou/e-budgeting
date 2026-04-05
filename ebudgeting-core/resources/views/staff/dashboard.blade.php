@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-6 col-md-12 col-6 mb-4">
+        <div class="col-12 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-12 col-6 mb-4">
+        <div class="col-12 col-sm-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
@@ -31,9 +31,9 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-4">
+        <div class="col-12 col-md-6 mb-4">
             <div class="card h-100">
-                <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="card-header d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
                     <h5 class="card-title m-0 me-2">Riwayat Pengajuanku</h5>
                     <a href="{{ route('reimbursements.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
                 </div>
@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 mb-4">
+        <div class="col-12 col-md-6 mb-4">
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="card-title m-0">Ketersediaan Anggaran Divisi</h5>

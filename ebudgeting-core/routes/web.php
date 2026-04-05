@@ -97,9 +97,10 @@ Route::middleware(['auth', 'role:admin|manager'])->prefix('budgets')->group(func
 // Rute untuk pengajuan reimbursement (Admin & Staff bisa buat, Admin & Manager bisa approve/reject)
 Route::middleware(['auth'])->prefix('reimbursements')->name('reimbursements.')->group(function () {
     Route::get('/', [ReimbursementController::class, 'index'])->name('index');
-    Route::post('/', [ReimbursementController::class, 'store'])->name('store')->middleware('role:admin|staff');
+    Route::post('/', [ReimbursementController::class, 'store'])->name('store')->middleware(['role:admin|staff', 'throttle:10,1']);
     Route::put('/{id}/approve', [ReimbursementController::class, 'approve'])->name('approve')->middleware('role:admin|manager');
     Route::put('/{id}/reject', [ReimbursementController::class, 'reject'])->name('reject')->middleware('role:admin|manager');
+    Route::delete('/{id}', [ReimbursementController::class, 'destroy'])->name('destroy');
 
     Route::get('/export-pdf', [ReimbursementController::class, 'exportPdf'])->name('export.pdf')->middleware('role:admin|manager');
 });

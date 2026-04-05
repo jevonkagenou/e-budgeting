@@ -31,18 +31,19 @@ class YearEndClosing extends Command
 
         DB::beginTransaction();
         try {
-            $pendingReimbursements = Reimbursement::where('status', 'pending')
+            $query = Reimbursement::where('status', 'pending')
                 ->whereHas('budget', function ($q) use ($activeYear) {
                     $q->where('fiscal_year_id', $activeYear->id);
-                })->get();
+                });
 
-            foreach ($pendingReimbursements as $reimbursement) {
-                $reimbursement->update([
-                    'status' => 'rejected',
-                    'rejection_reason' => 'Ditolak otomatis oleh sistem: Proses Tutup Buku Akhir Tahun (Year-End Closing).',
-                ]);
-            }
-            $this->info('Data Freeze: ' . $pendingReimbursements->count() . ' pengajuan pending telah ditolak.');
+            $rejectedCount = $query->count();
+            
+            $query->update([
+                'status' => 'rejected',
+                'rejection_reason' => 'Ditolak otomatis oleh sistem: Proses Tutup Buku Akhir Tahun (Year-End Closing).',
+            ]);
+
+            $this->info('Data Freeze: ' . $rejectedCount . ' pengajuan pending telah ditolak.');
 
             $budgets = Budget::with('division')->where('fiscal_year_id', $activeYear->id)->get();
 

@@ -11,8 +11,8 @@
     @endif
 
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Daftar Laporan Kinerja Keuangan</h5>
+        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <h5 class="mb-0 text-nowrap">Daftar Laporan Kinerja Keuangan</h5>
         </div>
         <div class="table-responsive">
             <table class="table table-hover">
@@ -56,7 +56,7 @@
             </table>
         </div>
         @if ($reports->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">
+            <div class="card-footer d-flex flex-wrap justify-content-center pb-0">
                 {{ $reports->links() }}
             </div>
         @endif

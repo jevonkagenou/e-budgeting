@@ -32,17 +32,17 @@
                         @method('PUT')
 
                         <div class="row">
-                            <div class="mb-3 col-md-6">
+                            <div class="mb-3 col-12 col-md-6">
                                 <label for="name" class="form-label">Nama Lengkap</label>
                                 <input class="form-control" type="text" id="name" name="name"
                                     value="{{ old('name', $user->name) }}" required autofocus />
                             </div>
-                            <div class="mb-3 col-md-6">
+                            <div class="mb-3 col-12 col-md-6">
                                 <label for="email" class="form-label">Email</label>
                                 <input class="form-control" type="email" id="email" name="email"
                                     value="{{ old('email', $user->email) }}" required />
                             </div>
-                            <div class="mb-3 col-md-12">
+                            <div class="mb-3 col-12">
                                 <label class="form-label">Divisi & Role</label>
                                 <input class="form-control" type="text"
                                     value="{{ $user->division->name ?? 'Admin Sistem' }} ({{ ucfirst($user->roles->first()->name ?? 'Tanpa Role') }})"
@@ -58,23 +58,23 @@
                         </div>
 
                         <div class="row">
-                            <div class="mb-3 col-md-4">
+                            <div class="mb-3 col-12 col-md-4">
                                 <label for="current_password" class="form-label">Password Saat Ini</label>
                                 <input class="form-control" type="password" id="current_password" name="current_password" />
                             </div>
-                            <div class="mb-3 col-md-4">
+                            <div class="mb-3 col-12 col-md-4">
                                 <label for="password" class="form-label">Password Baru</label>
                                 <input class="form-control" type="password" id="password" name="password" />
                             </div>
-                            <div class="mb-3 col-md-4">
+                            <div class="mb-3 col-12 col-md-4">
                                 <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
                                 <input class="form-control" type="password" id="password_confirmation"
                                     name="password_confirmation" />
                             </div>
                         </div>
 
-                        <div class="mt-2">
-                            <button type="submit" class="btn btn-primary me-2">Simpan Perubahan</button>
+                        <div class="mt-2 d-flex flex-column flex-sm-row gap-2">
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                             <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">Kembali</a>
                         </div>
                     </form>

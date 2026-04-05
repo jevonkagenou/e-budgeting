@@ -4,28 +4,27 @@
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Sistem /</span> Log Aktivitas</h4>
 
     <div class="card">
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3">
-            <h5 class="mb-3 mb-md-0">Riwayat Sistem (Audit Trail)</h5>
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 pb-3">
+            <h5 class="mb-0 text-nowrap">Riwayat Sistem (Audit Trail)</h5>
 
-            <form action="{{ route('admin.logs.index') }}" method="GET" class="d-flex flex-column flex-md-row gap-2">
-                <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control"
-                    title="Tanggal Awal">
+            <form action="{{ route('admin.logs.index') }}" method="GET" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+                <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" style="min-width: 130px;" title="Tanggal Awal">
 
-                <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control"
-                    title="Tanggal Akhir">
+                <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" style="min-width: 130px;" title="Tanggal Akhir">
 
                 <div class="input-group input-group-merge" style="min-width: 250px;">
                     <span class="input-group-text"><i class="bx bx-search"></i></span>
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                        placeholder="Cari aktivitas/pelaku...">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari aktivitas/pelaku...">
                 </div>
 
-                <button type="submit" class="btn btn-primary">Filter</button>
-                @if (request('search') || request('start_date') || request('end_date'))
-                    <a href="{{ route('admin.logs.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
-                        <i class="bx bx-refresh"></i> Reset
-                    </a>
-                @endif
+                <div class="d-flex flex-column flex-sm-row gap-2 text-nowrap">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    @if (request('search') || request('start_date') || request('end_date'))
+                        <a href="{{ route('admin.logs.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
+                            <i class="bx bx-refresh"></i> Reset
+                        </a>
+                    @endif
+                </div>
             </form>
         </div>
 
@@ -71,8 +70,8 @@
         </div>
 
         @if ($logs->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">
-                {{ $logs->appends(request()->query())->links() }}
+            <div class="card-footer pb-0">
+                {{ $logs->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>

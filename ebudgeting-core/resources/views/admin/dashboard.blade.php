@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-lg-4 col-md-12 col-6 mb-4">
+    <div class="col-12 col-sm-6 col-lg-4 mb-4">
         <div class="card">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-12 col-6 mb-4">
+    <div class="col-12 col-sm-6 col-lg-4 mb-4">
         <div class="card">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
@@ -28,7 +28,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-12 col-6 mb-4">
+    <div class="col-12 col-lg-4 mb-4">
         <div class="card">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
@@ -57,9 +57,9 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8 col-lg-8 order-1 mb-4">
+    <div class="col-12 col-lg-8 order-1 mb-4">
         <div class="card h-100">
-            <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card-header d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
                 <h5 class="card-title m-0 me-2">5 Pengajuan Dana Terbaru</h5>
                 <a href="{{ route('reimbursements.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
             </div>
@@ -99,9 +99,9 @@
         </div>
     </div>
 
-    <div class="col-md-4 col-lg-4 order-2 mb-4">
+    <div class="col-12 col-lg-4 order-2 mb-4">
         <div class="card h-100">
-            <div class="card-header d-flex align-items-center justify-content-between">
+            <div class="card-header d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
                 <h5 class="card-title m-0 me-2">Log Aktivitas</h5>
                 <a href="{{ route('admin.logs.index') }}" class="btn btn-sm btn-outline-secondary">Semua</a>
             </div>

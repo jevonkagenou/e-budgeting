@@ -21,23 +21,21 @@ class CloseExpiredBudgets extends Command
 
         DB::beginTransaction();
         try {
-            $expiredReimbursements = Reimbursement::where('status', 'pending')
+            $expiredQuery = Reimbursement::where('status', 'pending')
                 ->whereHas('budget', function ($q) use ($today) {
                     $q->whereDate('end_date', '<', $today)
                       ->orWhereHas('fiscalYear', function ($f) use ($today) {
                           $f->whereDate('end_date', '<', $today)
                             ->orWhere('is_active', false);
                       });
-                })->get();
+                });
 
-            $rejectedCount = 0;
-            foreach ($expiredReimbursements as $reimbursement) {
-                $reimbursement->update([
-                    'status' => 'rejected',
-                    'rejection_reason' => 'Ditolak otomatis oleh sistem: Masa berlaku anggaran atau Tahun Buku telah ditutup.',
-                ]);
-                $rejectedCount++;
-            }
+            $rejectedCount = $expiredQuery->count();
+            
+            $expiredQuery->update([
+                'status' => 'rejected',
+                'rejection_reason' => 'Ditolak otomatis oleh sistem: Masa berlaku anggaran atau Tahun Buku telah ditutup.',
+            ]);
 
             $expiredFiscalYearsCount = FiscalYear::where('is_active', true)
                 ->whereDate('end_date', '<', $today)

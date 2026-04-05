@@ -21,25 +21,17 @@
     @endif
 
     <div class="card">
-        <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-            <h5 class="mb-3 mb-md-0">Daftar Pagu Anggaran Divisi</h5>
-            <div class="d-flex flex-column flex-md-row align-items-center gap-3">
-
-                <div class="input-group input-group-merge" style="width: 250px;">
-                    <form action="{{ route('budgets.index') }}" method="GET" class="input-group input-group-merge"
-                        style="width: 250px;">
-                        <span class="input-group-text"><i class="bx bx-search"></i></span>
-                        <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                            placeholder="Cari anggaran/divisi...">
-                    </form>
+        <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <h5 class="mb-0 text-nowrap">Daftar Pagu Anggaran Divisi</h5>
+            <form action="{{ route('budgets.index') }}" method="GET" class="d-grid gap-2 d-lg-flex">
+                <div class="input-group input-group-merge" style="min-width: 250px;">
+                    <span class="input-group-text"><i class="bx bx-search"></i></span>
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Cari anggaran/divisi...">
                 </div>
-
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
-                        <i class="bx bx-plus me-1"></i> Buat Anggaran
-                    </button>
-                </div>
-            </div>
+                <button type="button" class="btn btn-primary text-nowrap" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="bx bx-plus me-1"></i> Buat Anggaran
+                </button>
+            </form>
         </div>
 
         <div class="table-responsive">
@@ -87,6 +79,9 @@
                                     {{ $budget->start_date ? \Carbon\Carbon::parse($budget->start_date)->format('d M Y') : '-' }}
                                     s/d
                                     {{ $budget->end_date ? \Carbon\Carbon::parse($budget->end_date)->format('d M Y') : '-' }}
+                                    @if($budget->end_date && \Carbon\Carbon::parse($budget->end_date)->copy()->endOfDay()->isPast())
+                                        <span class="badge bg-danger ms-2" style="font-size: 0.65rem; padding: 0.2rem 0.4rem;" title="Pagu ini telah mati (Tutup Buku) secara otomatis karena lewat batas waktu">Kadaluarsa</span>
+                                    @endif
                                 </small>
                             </td>
                             <td><strong>{{ number_format($totalAmount, 0, ',', '.') }}</strong></td>
@@ -136,8 +131,8 @@
         </div>
 
         @if ($budgets->hasPages())
-            <div class="card-footer d-flex justify-content-center pb-0">
-                {{ $budgets->appends(['search' => request('search')])->links() }}
+            <div class="card-footer pb-0">
+                {{ $budgets->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>
@@ -153,15 +148,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col mb-3">
-                                <label class="form-label">Nama Anggaran</label>
-                                <input type="text" name="name" class="form-control" value="{{ $budget->name }}"
-                                    required />
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Anggaran <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" value="{{ $budget->name }}" required />
                         </div>
-                        <div class="row g-2">
-                            <div class="col mb-3">
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
                                 <label class="form-label">Tahun Anggaran</label>
                                 <select name="fiscal_year_id" class="form-select" required>
                                     <option value="">-- Pilih Tahun --</option>
@@ -173,8 +165,8 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col mb-3">
-                                <label class="form-label">Kategori</label>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Kategori <span class="text-danger">*</span></label>
                                 <select name="budget_category_id" class="form-select" required>
                                     <option value="">-- Pilih Kategori --</option>
                                     @foreach ($categories as $cat)
@@ -186,9 +178,8 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col mb-3">
-                                <label class="form-label">Divisi</label>
+                        <div class="mb-3">
+                            <label class="form-label">Divisi <span class="text-danger">*</span></label>
                                 <select name="division_id" class="form-select" required>
                                     @foreach ($divisions as $divisi)
                                         <option value="{{ $divisi->id }}"
@@ -197,36 +188,35 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col mb-3">
-                                <label class="form-label">Total Pagu (Rp)</label>
+                        <div class="mb-3">
+                            <label class="form-label">Total Pagu (Rp) <span class="text-danger">*</span></label>
                                 <input type="number" name="total_amount" class="form-control"
                                     value="{{ intval($budget->total_amount) }}" min="{{ intval($budget->used_amount) }}"
                                     required />
                                 <small class="text-danger">*Minimal angka:
                                     {{ number_format((float) $budget->used_amount, 0, ',', '.') }} (Sesuai dana yang sudah
                                     terpakai)</small>
-                            </div>
                         </div>
-                        <div class="row g-2">
-                            <div class="col mb-0">
-                                <label class="form-label">Tanggal Mulai</label>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tanggal Mulai <span class="text-danger">*</span></label>
                                 <input type="date" name="start_date" class="form-control"
                                     value="{{ $budget->start_date ? \Carbon\Carbon::parse($budget->start_date)->format('Y-m-d') : '' }}">
                             </div>
-                            <div class="col mb-0">
-                                <label class="form-label">Tanggal Berakhir</label>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">Tanggal Berakhir <span class="text-danger">*</span></label>
                                 <input type="date" name="end_date" class="form-control"
                                     value="{{ $budget->end_date ? \Carbon\Carbon::parse($budget->end_date)->format('Y-m-d') : '' }}"
                                     required />
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer mt-3">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <div class="modal-footer">
+                        <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -242,15 +232,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Nama Anggaran<span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control"
-                                placeholder="Contoh: Anggaran Q1 IT" required />
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Anggaran<span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="Contoh: Anggaran Q1 IT" required />
                     </div>
-                    <div class="row g-2">
-                        <div class="col mb-3">
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Tahun Anggaran<span class="text-danger">*</span></label>
                             <select name="fiscal_year_id" class="form-select" required>
                                 <option value="">-- Pilih Tahun --</option>
@@ -259,7 +246,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col mb-3">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Kategori<span class="text-danger">*</span></label>
                             <select name="budget_category_id" class="form-select" required>
                                 <option value="">-- Pilih Kategori --</option>
@@ -269,39 +256,37 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Divisi<span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <label class="form-label">Divisi<span class="text-danger">*</span></label>
                             <select name="division_id" class="form-select" required>
                                 <option value="">-- Pilih Divisi --</option>
                                 @foreach ($divisions as $divisi)
                                     <option value="{{ $divisi->id }}">{{ $divisi->name }}</option>
                                 @endforeach
                             </select>
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col mb-3">
-                            <label class="form-label">Total Pagu (Rp)<span class="text-danger">*</span></label>
+                    <div class="mb-3">
+                        <label class="form-label">Total Pagu (Rp)<span class="text-danger">*</span></label>
                             <input type="number" name="total_amount" class="form-control" placeholder="10000000"
                                 min="0" required />
                             <small class="text-muted">Masukkan angka saja tanpa titik/koma.</small>
-                        </div>
                     </div>
-                    <div class="row g-2">
-                        <div class="col mb-0">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Tanggal Mulai<span class="text-danger">*</span></label>
                             <input type="date" name="start_date" class="form-control" required />
                         </div>
-                        <div class="col mb-0">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Tanggal Berakhir<span class="text-danger">*</span></label>
                             <input type="date" name="end_date" class="form-control" required />
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer mt-3">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Anggaran</button>
+                <div class="modal-footer">
+                    <div class="d-grid w-100 d-sm-flex justify-content-sm-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>

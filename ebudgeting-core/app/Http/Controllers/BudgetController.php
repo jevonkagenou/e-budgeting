@@ -93,12 +93,30 @@ class BudgetController extends Controller
             return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup. Data historis tidak boleh diubah.');
         }
 
+        if (now()->format('Y-m-d') > $budget->end_date && now()->format('Y-m-d') > $request->end_date) {
+            return back()->with('error', 'Akses ditolak: Pagu ini telah kadaluwarsa (Tutup Buku Bulan ' . \Carbon\Carbon::parse($budget->end_date)->translatedFormat('F') . '). Anda dilarang mengedit saldonya kecuali secara spesifik merubah perpanjangan Tanggal Berakhir anggaran.');
+        }
+
+        $pendingAmount = \App\Models\Reimbursement::where('budget_id', $budget->id)
+            ->where('status', 'pending')
+            ->sum('amount');
+            
+        $minAllowed = $budget->used_amount + $pendingAmount;
+
         $request->validate([
-            'fiscal_year_id' => 'required|exists:fiscal_years,id',
+            'fiscal_year_id' => [
+                'required',
+                'exists:fiscal_years,id',
+                Rule::unique('budgets')->where(function ($query) use ($request) {
+                    return $query->where('budget_category_id', $request->budget_category_id)
+                        ->where('division_id', $request->division_id)
+                        ->whereNull('deleted_at');
+                })->ignore($budget->id)
+            ],
             'budget_category_id' => 'required|exists:budget_categories,id',
             'division_id' => 'required|exists:divisions,id',
             'name' => 'required|string|max:255',
-            'total_amount' => 'required|numeric|min:' . $budget->used_amount,
+            'total_amount' => 'required|numeric|min:' . $minAllowed,
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -127,6 +145,10 @@ class BudgetController extends Controller
     public function destroy($id)
     {
         $budget = Budget::with('fiscalYear')->findOrFail($id);
+
+        if ($budget->used_amount > 0 || \App\Models\Reimbursement::where('budget_id', $budget->id)->exists()) {
+            return back()->with('error', 'Akses ditolak: Anggaran memiliki riwayat pencairan dana atau pengajuan aktif. Data ini tidak boleh dihapus manual!');
+        }
 
         if (!$budget->fiscalYear->is_active) {
             return back()->with('error', 'Akses ditolak: Tahun Anggaran sudah ditutup. Data historis tidak boleh dihapus.');
