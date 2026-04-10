@@ -103,7 +103,7 @@
         <div class="card h-100">
             <div class="card-header d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
                 <h5 class="card-title m-0 me-2">Log Aktivitas</h5>
-                <a href="{{ route('admin.logs.index') }}" class="btn btn-sm btn-outline-secondary">Semua</a>
+                <a href="{{ route('management.logs.index') }}" class="btn btn-sm btn-outline-secondary">Semua</a>
             </div>
             <div class="card-body">
                 <ul class="p-0 m-0">
