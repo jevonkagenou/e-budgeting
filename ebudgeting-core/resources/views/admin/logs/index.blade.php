@@ -7,7 +7,7 @@
         <div class="card-header d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 pb-3">
             <h5 class="mb-0 text-nowrap">Riwayat Sistem (Audit Trail)</h5>
 
-            <form action="{{ route('admin.logs.index') }}" method="GET" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+            <form action="{{ route('management.logs.index') }}" method="GET" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
                 <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control" style="min-width: 130px;" title="Tanggal Awal">
 
                 <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control" style="min-width: 130px;" title="Tanggal Akhir">
@@ -20,7 +20,7 @@
                 <div class="d-flex flex-column flex-sm-row gap-2 text-nowrap">
                     <button type="submit" class="btn btn-primary">Filter</button>
                     @if (request('search') || request('start_date') || request('end_date'))
-                        <a href="{{ route('admin.logs.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
+                        <a href="{{ route('management.logs.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
                             <i class="bx bx-refresh"></i> Reset
                         </a>
                     @endif

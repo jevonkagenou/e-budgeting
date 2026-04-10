@@ -125,16 +125,16 @@
             </a>
         </li>
 
-        @if (Auth::user()->hasRole('admin'))
-            <li class="menu-item {{ request()->routeIs('annual_reports.*') ? 'active' : '' }}">
-                <a href="{{ route('annual_reports.index') }}" class="menu-link">
+        @if (Auth::user()->hasAnyRole(['admin', 'manager']))
+            <li class="menu-item {{ request()->routeIs('management.annual_reports.*') ? 'active' : '' }}">
+                <a href="{{ route('management.annual_reports.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-archive"></i>
                     <div data-i18n="Arsip Laporan">Arsip Laporan</div>
                 </a>
             </li>
 
-            <li class="menu-item {{ request()->routeIs('admin.logs.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.logs.index') }}" class="menu-link">
+            <li class="menu-item {{ request()->routeIs('management.logs.*') ? 'active' : '' }}">
+                <a href="{{ route('management.logs.index') }}" class="menu-link">
                     <i class="menu-icon tf-icons bx bx-history"></i>
                     <div data-i18n="Log Aktivitas">Log Aktivitas</div>
                 </a>

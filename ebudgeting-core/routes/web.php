@@ -69,11 +69,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/categories', [BudgetCategoryController::class, 'store'])->name('admin.categories.store');
     Route::put('/categories/{id}', [BudgetCategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{id}', [BudgetCategoryController::class, 'destroy'])->name('admin.categories.destroy');
+});
 
-    Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('annual_reports.index');
-    Route::get('/annual-reports/{id}/download', [AnnualReportController::class, 'download'])->name('annual_reports.download');
+// Rute Management (Admin & Manager)
+Route::middleware(['auth', 'role:admin|manager'])->prefix('management')->group(function () {
+    Route::get('/annual-reports', [AnnualReportController::class, 'index'])->name('management.annual_reports.index');
+    Route::get('/annual-reports/{id}/download', [AnnualReportController::class, 'download'])->name('management.annual_reports.download');
 
-    Route::get('/logs', [ActivityLogController::class, 'index'])->name('admin.logs.index');
+    Route::get('/logs', [ActivityLogController::class, 'index'])->name('management.logs.index');
 });
 
 // Rute Manajer

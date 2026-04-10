@@ -41,7 +41,7 @@
                             </td>
                             <td>{{ $report->created_at->translatedFormat('d M Y H:i') }}</td>
                             <td>
-                                <a href="{{ route('annual_reports.download', $report->id) }}"
+                                <a href="{{ route('management.annual_reports.download', $report->id) }}"
                                     class="btn btn-sm btn-primary">
                                     <i class="bx bx-download me-1"></i> Unduh
                                 </a>
