@@ -15,9 +15,57 @@ class DashboardController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
         $division = $user->division;
+        $role = $user->roles->first()->name ?? 'staff';
 
         $activeFiscalYear = FiscalYear::where('is_active', true)->first();
 
+        if ($role === 'manager' || $user->hasRole('manager')) {
+            $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+            
+            $pendingCount = Reimbursement::whereHas('user', function ($q) use ($managedDivisionIds) {
+                $q->whereIn('division_id', $managedDivisionIds);
+            })->where('status', 'pending')->count();
+            
+            $approvedThisMonth = Reimbursement::whereHas('user', function ($q) use ($managedDivisionIds) {
+                $q->whereIn('division_id', $managedDivisionIds);
+            })->where('status', 'approved')
+                ->whereMonth('updated_at', now()->month)
+                ->whereYear('updated_at', now()->year)
+                ->sum('amount');
+                
+            $totalBudgetRemaining = Budget::whereIn('division_id', $managedDivisionIds)
+                ->whereDate('end_date', '>=', now()->format('Y-m-d'))
+                ->whereHas('fiscalYear', function ($q) {
+                    $q->where('is_active', true);
+                })->sum(\Illuminate\Support\Facades\DB::raw('total_amount - used_amount'));
+                
+            $recentReimbursements = Reimbursement::with('user.division')
+                ->whereHas('user', function ($q) use ($managedDivisionIds) {
+                    $q->whereIn('division_id', $managedDivisionIds);
+                })->latest()->take(5)->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data dasbor manager berhasil dimuat',
+                'data' => [
+                    'profile' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => 'manager',
+                        'division' => $division ? $division->name : 'Tidak ada divisi',
+                    ],
+                    'fiscal_year' => $activeFiscalYear ? $activeFiscalYear->year : 'Tidak ada tahun aktif',
+                    'stats' => [
+                        'pending_count' => $pendingCount,
+                        'approved_this_month' => $approvedThisMonth,
+                        'total_budget_remaining' => $totalBudgetRemaining,
+                    ],
+                    'recent_history' => $recentReimbursements
+                ]
+            ], 200);
+        }
+
+        // Default Staff Logic
         $budgetInfo = null;
         if ($division && $activeFiscalYear) {
             $budgetInfo = Budget::where('division_id', $division->id)
@@ -37,7 +85,7 @@ class DashboardController extends Controller
                 'profile' => [
                     'name' => $user->name,
                     'email' => $user->email,
-                    'role' => $user->roles->first()->name ?? 'staff',
+                    'role' => 'staff',
                     'division' => $division ? $division->name : 'Tidak ada divisi',
                 ],
                 'fiscal_year' => $activeFiscalYear ? $activeFiscalYear->year : 'Tidak ada tahun aktif',

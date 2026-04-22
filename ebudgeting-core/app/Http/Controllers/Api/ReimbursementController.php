@@ -183,4 +183,70 @@ class ReimbursementController extends Controller
             ], 500);
         }
     }
+
+    public function destroy(Request $request, $id)
+    {
+        $reimbursement = Reimbursement::find($id);
+
+        if (!$reimbursement) {
+            return response()->json(['success' => false, 'message' => 'Data pengajuan tidak ditemukan'], 404);
+        }
+
+        $user = $request->user();
+
+        if ($reimbursement->user_id !== $user->id && !$user->hasRole('admin')) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak: Anda tidak memiliki hak untuk membatalkan pengajuan ini.'], 403);
+        }
+
+        if ($reimbursement->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak: Data yang sudah diproses (Disetujui/Ditolak) tidak boleh dihapus demi integritas audit.'], 400);
+        }
+
+        $reimbursement->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan dana berhasil dibatalkan dan dihapus.'
+        ], 200);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->hasRole('manager')) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        $query = Reimbursement::with(['user.division', 'budget.fiscalYear', 'budget.budgetCategory', 'actionBy'])
+            ->where('status', 'approved');
+
+        $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+        $query->whereHas('user', function ($q) use ($managedDivisionIds) {
+            $q->whereIn('division_id', $managedDivisionIds);
+        });
+
+        if ($request->has('start_date') && $request->start_date != '') {
+            $query->whereDate('updated_at', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && $request->end_date != '') {
+            $query->whereDate('updated_at', '<=', $request->end_date);
+        }
+
+        $reimbursements = collect();
+
+        $query->latest('updated_at')->chunk(500, function ($chunk) use ($reimbursements) {
+            foreach ($chunk as $item) {
+                $reimbursements->push($item);
+            }
+        });
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reimbursements.laporan_pdf', compact('reimbursements', 'request'))
+            ->setPaper('a4', 'landscape');
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'LPJ_Reimbursement_' . date('Ymd_His') . '.pdf');
+    }
 }
