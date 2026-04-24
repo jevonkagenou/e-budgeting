@@ -16,7 +16,9 @@ class ProfileController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'password' => 'nullable|string|min:8',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'current_password' => ['nullable', 'required_with:password', 'current_password'],
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -28,6 +30,7 @@ class ProfileController extends Controller
         }
 
         $user->name = $request->name;
+        $user->email = $request->email;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
@@ -39,9 +42,12 @@ class ProfileController extends Controller
             'success' => true,
             'message' => 'Profil berhasil diperbarui',
             'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ]
             ]
         ], 200);
     }
