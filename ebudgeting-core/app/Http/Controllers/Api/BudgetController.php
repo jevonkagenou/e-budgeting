@@ -13,6 +13,27 @@ use Illuminate\Support\Facades\Auth;
 
 class BudgetController extends Controller
 {
+    /**
+     * GET /budgets/form-metadata
+     * Menyediakan data dropdown untuk form buat/edit anggaran.
+     */
+    public function formMetadata(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->hasRole('manager')) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'fiscal_years' => FiscalYear::where('is_active', true)->get(['id', 'year', 'start_date', 'end_date']),
+                'divisions' => Division::orderBy('name')->get(['id', 'name']),
+                'budget_categories' => BudgetCategory::orderBy('name')->get(['id', 'name']),
+            ],
+        ], 200);
+    }
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -60,22 +81,28 @@ class BudgetController extends Controller
         if (!$user->hasRole('manager')) return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
 
         $request->validate([
-            'fiscal_year_id' => [
-                'required',
-                'exists:fiscal_years,id',
-                Rule::unique('budgets')->where(function ($query) use ($request) {
-                    return $query->where('budget_category_id', $request->budget_category_id)
-                        ->where('division_id', $request->division_id)
-                        ->whereNull('deleted_at');
-                })
-            ],
-            'budget_category_id' => 'required|exists:budget_categories,id',
-            'division_id' => 'required|exists:divisions,id',
-            'name' => 'required|string|max:255',
-            'total_amount' => 'required|numeric|min:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'fiscal_year_id'      => 'required|exists:fiscal_years,id',
+            'budget_category_id'  => 'required|exists:budget_categories,id',
+            'division_id'         => 'required|exists:divisions,id',
+            'name'                => 'required|string|max:255',
+            'total_amount'        => 'required|numeric|min:0',
+            'start_date'          => 'required|date',
+            'end_date'            => 'required|date|after_or_equal:start_date',
         ]);
+
+        // Cek duplikasi kombinasi fiscal_year + kategori + divisi secara manual agar pesan lebih informatif
+        $duplicate = Budget::where('fiscal_year_id', $request->fiscal_year_id)
+            ->where('budget_category_id', $request->budget_category_id)
+            ->where('division_id', $request->division_id)
+            ->whereNull('deleted_at')
+            ->exists();
+
+        if ($duplicate) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anggaran dengan kombinasi Tahun Anggaran, Kategori, dan Divisi yang sama sudah ada. Silakan pilih kombinasi yang berbeda.',
+            ], 422);
+        }
 
         $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);
 

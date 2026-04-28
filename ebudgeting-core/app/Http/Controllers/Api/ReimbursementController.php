@@ -38,10 +38,17 @@ class ReimbursementController extends Controller
             ], 403);
         }
 
-        $query = Reimbursement::with('user:id,name')->where('status', 'pending');
+        $query = Reimbursement::with([
+            'user:id,name,division_id',
+            'user.division:id,name',
+            'budget:id,name',
+        ])->where('status', 'pending');
 
         if ($user->hasRole('manager')) {
-            $query->where('division_id', $user->division_id);
+            $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+            $query->whereHas('user', function ($q) use ($managedDivisionIds) {
+                $q->whereIn('division_id', $managedDivisionIds);
+            });
         }
 
         $pendingReimbursements = $query->orderBy('created_at', 'asc')->get();
@@ -53,6 +60,46 @@ class ReimbursementController extends Controller
         ], 200);
     }
 
+    public function managerList(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->hasAnyRole(['manager', 'admin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak.',
+            ], 403);
+        }
+
+        $query = Reimbursement::with([
+            'user:id,name,division_id',
+            'user.division:id,name',
+            'budget:id,name',
+        ])->orderBy('created_at', 'desc');
+
+        // Filter per divisi yang dikelola (hanya berlaku untuk manager, admin lihat semua)
+        if ($user->hasRole('manager')) {
+            $managedDivisionIds = $user->managedDivisions->pluck('id')->toArray();
+            $query->whereHas('user', function ($q) use ($managedDivisionIds) {
+                $q->whereIn('division_id', $managedDivisionIds);
+            });
+        }
+
+        // Filter opsional by status dari query param
+        $status = $request->query('status');
+        if ($status && in_array($status, ['pending', 'approved', 'rejected'])) {
+            $query->where('status', $status);
+        }
+
+        $reimbursements = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar pengajuan berhasil dimuat',
+            'data' => $reimbursements,
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -60,7 +107,7 @@ class ReimbursementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'amount' => 'required|numeric|min:1000',
-            'receipt' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'receipt' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $recentSubmission = Reimbursement::where('user_id', Auth::id())

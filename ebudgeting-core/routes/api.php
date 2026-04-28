@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
     Route::get('/reimbursements', [ReimbursementController::class, 'index']);
+    Route::get('/reimbursements/manager', [ReimbursementController::class, 'managerList']);
     Route::get('/reimbursements/pending', [ReimbursementController::class, 'pendingList']);
     Route::post('/reimbursements', [ReimbursementController::class, 'store']);
     Route::put('/reimbursements/{id}/status', [ReimbursementController::class, 'updateStatus']);
@@ -34,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/management/annual-reports/{id}/download', [AnnualReportController::class, 'download']);
 
     // Budget routes (Manager)
+    Route::get('/budgets/form-metadata', [BudgetController::class, 'formMetadata']);
     Route::get('/budgets', [BudgetController::class, 'index']);
     Route::post('/budgets', [BudgetController::class, 'store']);
     Route::put('/budgets/{id}', [BudgetController::class, 'update']);
