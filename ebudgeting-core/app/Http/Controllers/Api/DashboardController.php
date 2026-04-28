@@ -66,11 +66,26 @@ class DashboardController extends Controller
         }
 
         // Default Staff Logic
-        $budgetInfo = null;
+        $budgets = collect();
+        $budgetSummary = ['total_amount' => 0, 'used_amount' => 0, 'remaining_amount' => 0];
+
         if ($division && $activeFiscalYear) {
-            $budgetInfo = Budget::where('division_id', $division->id)
+            $budgets = Budget::with('budgetCategory')
+                ->where('division_id', $division->id)
                 ->where('fiscal_year_id', $activeFiscalYear->id)
-                ->first();
+                ->whereDate('end_date', '>=', now()->format('Y-m-d'))
+                ->whereHas('fiscalYear', function ($q) {
+                    $q->whereDate('end_date', '>=', now()->format('Y-m-d'))
+                      ->where('is_active', true);
+                })
+                ->whereRaw('total_amount > used_amount')
+                ->get();
+
+            $budgetSummary = [
+                'total_amount' => $budgets->sum('total_amount'),
+                'used_amount' => $budgets->sum('used_amount'),
+                'remaining_amount' => $budgets->sum('total_amount') - $budgets->sum('used_amount'),
+            ];
         }
 
         $recentReimbursements = Reimbursement::where('user_id', $user->id)
@@ -89,11 +104,17 @@ class DashboardController extends Controller
                     'division' => $division ? $division->name : 'Tidak ada divisi',
                 ],
                 'fiscal_year' => $activeFiscalYear ? $activeFiscalYear->year : 'Tidak ada tahun aktif',
-                'budget' => [
-                    'total_amount' => $budgetInfo ? $budgetInfo->total_amount : 0,
-                    'used_amount' => $budgetInfo ? $budgetInfo->used_amount : 0,
-                    'remaining_amount' => $budgetInfo ? ($budgetInfo->total_amount - $budgetInfo->used_amount) : 0,
-                ],
+                'budget' => $budgetSummary,
+                'available_budgets' => $budgets->map(function ($b) {
+                    return [
+                        'id' => $b->id,
+                        'name' => $b->name,
+                        'category' => $b->budgetCategory ? $b->budgetCategory->name : '-',
+                        'total_amount' => $b->total_amount,
+                        'used_amount' => $b->used_amount,
+                        'remaining' => $b->total_amount - $b->used_amount,
+                    ];
+                }),
                 'recent_history' => $recentReimbursements
             ]
         ], 200);

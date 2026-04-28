@@ -60,7 +60,7 @@ class ReimbursementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'amount' => 'required|numeric|min:1000',
-            'receipt' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'receipt' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $recentSubmission = Reimbursement::where('user_id', Auth::id())
@@ -83,10 +83,15 @@ class ReimbursementController extends Controller
             ], 400);
         }
 
-        $remainingBalance = $budget->total_amount - $budget->used_amount;
+        $pendingAmount = Reimbursement::where('budget_id', $budget->id)
+            ->where('status', 'pending')
+            ->sum('amount');
+
+        $remainingBalance = $budget->total_amount - $budget->used_amount - $pendingAmount;
         if ($request->amount > $remainingBalance) {
             return response()->json([
-                'message' => 'Pengajuan ditolak: Sisa pagu anggaran tidak mencukupi.',
+                'success' => false,
+                'message' => 'Pengajuan ditolak: Sisa pagu anggaran (Rp ' . number_format($remainingBalance, 0, ',', '.') . ') tidak mencukupi.',
                 'remaining_balance' => $remainingBalance
             ], 400);
         }

@@ -126,11 +126,11 @@
                                                 <i class="bx bx-x"></i>
                                             </button>
                                         @endhasanyrole
-                                        
-                                        @if($item->user_id === Auth::id())
-                                            <form action="{{ route('reimbursements.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan ini?')">
+
+                                        @if($item->user_id === Auth::id() && Auth::user()->hasRole('staff'))
+                                            <form id="delete-form-{{ $item->id }}" action="{{ route('reimbursements.destroy', $item->id) }}" method="POST">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" title="Batalkan Pengajuan">
+                                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger" onclick="confirmDelete('{{ $item->id }}')" title="Batalkan Pengajuan">
                                                     <i class="bx bx-trash"></i>
                                                 </button>
                                             </form>
@@ -321,6 +321,23 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('approve-form-' + id).submit();
+                }
+            });
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Batalkan Pengajuan?',
+                text: "Data pengajuan ini akan dihapus secara permanen.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff3e1d',
+                cancelButtonColor: '#8592a3',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
                 }
             });
         }
