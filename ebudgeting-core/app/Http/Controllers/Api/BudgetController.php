@@ -86,9 +86,9 @@ class BudgetController extends Controller
             'budget_category_id'  => 'required|exists:budget_categories,id',
             'division_id'         => 'required|exists:divisions,id',
             'name'                => 'required|string|max:255',
-            'total_amount'        => 'required|numeric|min:0',
+            'total_amount'        => 'required|numeric|min:1000000',
             'start_date'          => 'required|date',
-            'end_date'            => 'required|date|after_or_equal:start_date',
+            'end_date'            => 'required|date|after:today|after_or_equal:start_date',
         ]);
 
         // Cek duplikasi kombinasi fiscal_year + kategori + divisi secara manual agar pesan lebih informatif
@@ -177,9 +177,9 @@ class BudgetController extends Controller
             'budget_category_id'  => 'required|exists:budget_categories,id',
             'division_id'         => 'required|exists:divisions,id',
             'name'                => 'required|string|max:255',
-            'total_amount'        => 'required|numeric|min:' . $minAllowed,
+            'total_amount'        => 'required|numeric|min:' . max(1000000, $minAllowed),
             'start_date'          => 'required|date',
-            'end_date'            => 'required|date|after_or_equal:start_date',
+            'end_date'            => 'required|date|after:today|after_or_equal:start_date',
         ]);
 
         $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);
