@@ -19,12 +19,31 @@ class AnnualReportController extends Controller
             ], 403);
         }
 
-        $reports = AnnualReport::with('fiscalYear')->latest()->paginate(10);
+        $search = $request->input('search');
+        $fiscalYearId = $request->input('fiscal_year_id');
+
+        $query = AnnualReport::with('fiscalYear')->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('fiscalYear', function ($qFy) use ($search) {
+                      $qFy->where('year', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($fiscalYearId) {
+            $query->where('fiscal_year_id', $fiscalYearId);
+        }
+
+        $reports = $query->paginate(10);
 
         return response()->json([
             'success' => true,
             'message' => 'Daftar laporan tahunan berhasil dimuat',
-            'data' => $reports
+            'data'    => $reports,
         ], 200);
     }
 

@@ -8,7 +8,6 @@ use App\Models\Division;
 use App\Models\FiscalYear;
 use App\Models\BudgetCategory;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class BudgetController extends Controller
@@ -50,16 +49,18 @@ class BudgetController extends Controller
         $query = Budget::with(['division', 'creator', 'fiscalYear', 'budgetCategory']);
 
         if ($search) {
-            $query->where('name', 'ilike', "%{$search}%")
-                ->orWhereHas('division', function ($q) use ($search) {
-                    $q->where('name', 'ilike', "%{$search}%");
-                })
-                ->orWhereHas('budgetCategory', function ($q) use ($search) {
-                    $q->where('name', 'ilike', "%{$search}%");
-                })
-                ->orWhereHas('fiscalYear', function ($q) use ($search) {
-                    $q->where('year', 'ilike', "%{$search}%");
-                });
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('division', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('budgetCategory', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('fiscalYear', function ($q2) use ($search) {
+                        $q2->where('year', 'like', "%{$search}%");
+                    });
+            });
         }
 
         // Add scope for manager: maybe only see budgets for their managed divisions?
@@ -157,22 +158,28 @@ class BudgetController extends Controller
             
         $minAllowed = $budget->used_amount + $pendingAmount;
 
+        // Cek duplikasi kombinasi secara manual untuk memberikan pesan yang informatif
+        $duplicate = Budget::where('fiscal_year_id', $request->fiscal_year_id)
+            ->where('budget_category_id', $request->budget_category_id)
+            ->where('division_id', $request->division_id)
+            ->whereNull('deleted_at')
+            ->where('id', '!=', $budget->id)
+            ->exists();
+
+        if ($duplicate) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anggaran dengan kombinasi Tahun Anggaran, Kategori, dan Divisi yang sama sudah ada. Silakan pilih kombinasi yang berbeda.',
+            ], 422);
+        }
+
         $request->validate([
-            'fiscal_year_id' => [
-                'required',
-                'exists:fiscal_years,id',
-                Rule::unique('budgets')->where(function ($query) use ($request) {
-                    return $query->where('budget_category_id', $request->budget_category_id)
-                        ->where('division_id', $request->division_id)
-                        ->whereNull('deleted_at');
-                })->ignore($budget->id)
-            ],
-            'budget_category_id' => 'required|exists:budget_categories,id',
-            'division_id' => 'required|exists:divisions,id',
-            'name' => 'required|string|max:255',
-            'total_amount' => 'required|numeric|min:' . $minAllowed,
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'budget_category_id'  => 'required|exists:budget_categories,id',
+            'division_id'         => 'required|exists:divisions,id',
+            'name'                => 'required|string|max:255',
+            'total_amount'        => 'required|numeric|min:' . $minAllowed,
+            'start_date'          => 'required|date',
+            'end_date'            => 'required|date|after_or_equal:start_date',
         ]);
 
         $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);
