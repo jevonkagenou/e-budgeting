@@ -102,13 +102,21 @@ class ReimbursementController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'budget_id' => 'required|exists:budgets,id',
-            'title' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'budget_id'   => 'required|exists:budgets,id',
+            'title'       => 'required|string|max:255',
             'description' => 'required|string',
-            'amount' => 'required|numeric|min:1000',
-            'receipt' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'amount'      => 'required|numeric|min:1000',
+            'receipt'     => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
 
         $recentSubmission = Reimbursement::where('user_id', Auth::id())
             ->where('budget_id', $request->budget_id)

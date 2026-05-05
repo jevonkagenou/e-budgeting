@@ -9,6 +9,7 @@ use App\Models\FiscalYear;
 use App\Models\BudgetCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BudgetController extends Controller
 {
@@ -81,15 +82,23 @@ class BudgetController extends Controller
         $user = $request->user();
         if (!$user->hasRole('manager')) return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
 
-        $request->validate([
-            'fiscal_year_id'      => 'required|exists:fiscal_years,id',
-            'budget_category_id'  => 'required|exists:budget_categories,id',
-            'division_id'         => 'required|exists:divisions,id',
-            'name'                => 'required|string|max:255',
-            'total_amount'        => 'required|numeric|min:1000000',
-            'start_date'          => 'required|date',
-            'end_date'            => 'required|date|after:today|after_or_equal:start_date',
+        $validator = Validator::make($request->all(), [
+            'fiscal_year_id'     => 'required|exists:fiscal_years,id',
+            'budget_category_id' => 'required|exists:budget_categories,id',
+            'division_id'        => 'required|exists:divisions,id',
+            'name'               => 'required|string|max:255',
+            'total_amount'       => 'required|numeric|min:1000000',
+            'start_date'         => 'required|date',
+            'end_date'           => 'required|date|after:today|after_or_equal:start_date',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
 
         // Cek duplikasi kombinasi fiscal_year + kategori + divisi secara manual agar pesan lebih informatif
         $duplicate = Budget::where('fiscal_year_id', $request->fiscal_year_id)
@@ -148,17 +157,37 @@ class BudgetController extends Controller
             return response()->json(['success' => false, 'message' => 'Akses ditolak: Tahun Anggaran sudah ditutup.'], 403);
         }
 
+        // Validasi dulu — SEBELUM query ke DB lain
+        $pendingAmount = \App\Models\Reimbursement::where('budget_id', $budget->id)
+            ->where('status', 'pending')
+            ->sum('amount');
+
+        $minAllowed = max(1000000, $budget->used_amount + $pendingAmount);
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'fiscal_year_id'     => 'required|exists:fiscal_years,id',
+            'budget_category_id' => 'required|exists:budget_categories,id',
+            'division_id'        => 'required|exists:divisions,id',
+            'name'               => 'required|string|max:255',
+            'total_amount'       => 'required|numeric|min:' . $minAllowed,
+            'start_date'         => 'required|date',
+            'end_date'           => 'required|date|after:today|after_or_equal:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        // Cek apakah anggaran sudah kadaluarsa sepenuhnya
         if (now()->format('Y-m-d') > $budget->end_date && now()->format('Y-m-d') > $request->end_date) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak: Pagu ini telah kadaluwarsa.'], 403);
         }
 
-        $pendingAmount = \App\Models\Reimbursement::where('budget_id', $budget->id)
-            ->where('status', 'pending')
-            ->sum('amount');
-            
-        $minAllowed = $budget->used_amount + $pendingAmount;
-
-        // Cek duplikasi kombinasi secara manual untuk memberikan pesan yang informatif
+        // Cek duplikasi kombinasi
         $duplicate = Budget::where('fiscal_year_id', $request->fiscal_year_id)
             ->where('budget_category_id', $request->budget_category_id)
             ->where('division_id', $request->division_id)
@@ -169,18 +198,9 @@ class BudgetController extends Controller
         if ($duplicate) {
             return response()->json([
                 'success' => false,
-                'message' => 'Anggaran dengan kombinasi Tahun Anggaran, Kategori, dan Divisi yang sama sudah ada. Silakan pilih kombinasi yang berbeda.',
+                'message' => 'Anggaran dengan kombinasi Tahun Anggaran, Kategori, dan Divisi yang sama sudah ada.',
             ], 422);
         }
-
-        $request->validate([
-            'budget_category_id'  => 'required|exists:budget_categories,id',
-            'division_id'         => 'required|exists:divisions,id',
-            'name'                => 'required|string|max:255',
-            'total_amount'        => 'required|numeric|min:' . max(1000000, $minAllowed),
-            'start_date'          => 'required|date',
-            'end_date'            => 'required|date|after:today|after_or_equal:start_date',
-        ]);
 
         $fiscalYear = FiscalYear::findOrFail($request->fiscal_year_id);
 
@@ -192,19 +212,19 @@ class BudgetController extends Controller
         }
 
         $budget->update([
-            'fiscal_year_id' => $request->fiscal_year_id,
+            'fiscal_year_id'     => $request->fiscal_year_id,
             'budget_category_id' => $request->budget_category_id,
-            'division_id' => $request->division_id,
-            'name' => $request->name,
-            'total_amount' => $request->total_amount,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
+            'division_id'        => $request->division_id,
+            'name'               => $request->name,
+            'total_amount'       => $request->total_amount,
+            'start_date'         => $request->start_date,
+            'end_date'           => $request->end_date,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data anggaran berhasil diperbarui!',
-            'data' => $budget
+            'data'    => $budget
         ], 200);
     }
 

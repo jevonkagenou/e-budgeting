@@ -43,10 +43,10 @@ class ProfileController extends Controller
             'message' => 'Profil berhasil diperbarui',
             'data' => [
                 'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
+                    'id'    => $user->id,
+                    'name'  => $user->name,
                     'email' => $user->email,
-                    'role' => $user->role,
+                    'role'  => $user->roles->first()->name ?? 'staff',
                 ]
             ]
         ], 200);
